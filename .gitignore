@@ -2,6 +2,10 @@
 foto.zip
 foto/
 
+# Server-only configuration with real recipients and SMTP passwords.
+config.php
+.env
+
 # OS/editor noise.
 .DS_Store
 Thumbs.db

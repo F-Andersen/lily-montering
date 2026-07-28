@@ -3,79 +3,175 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Møbelmontering og handyman i Norge | LILY Montering</title>
+    <!--
+      SITE CONFIGURATION - update before production launch:
+      business name: LILY Montering
+      slogan: Presis montering. Ryddig levert.
+      telephone: not confirmed
+      email: not confirmed
+      public domain: https://example.com/ (replace in canonical, og:url, og:image, robots.txt, sitemap.xml)
+      service region: Østlandet (confirm with owner)
+      organization number: not confirmed
+      form recipient: configure in config.php copied from config.example.php
+      social or messaging links: not confirmed
+    -->
+    <title>Møbelmontering og handyman i Østlandet | LILY Montering</title>
     <meta
       name="description"
-      content="Presis og ryddig montering av kontormøbler, garderober, kjøkken, hyller, TV-fester og små handyman-oppdrag for bedrifter og private i Norge."
+      content="Profesjonell montering av kontormøbler, kjøkken, garderober og hjemmemøbler samt praktiske handyman-tjenester i Østlandet. Be om et uforpliktende tilbud."
     >
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Møbelmontering og handyman i Norge | LILY Montering">
+    <link rel="canonical" href="https://example.com/">
+    <meta property="og:title" content="Møbelmontering og handyman i Østlandet | LILY Montering">
     <meta
       property="og:description"
-      content="Profesjonell møbelmontering og praktiske småjobber for kontor, skole, barnehage, næring og private hjem."
+      content="Presis og ryddig montering av garderober, kjøkken, kontormøbler, hyller, TV-fester og små handyman-oppdrag."
     >
     <meta property="og:type" content="website">
     <meta property="og:locale" content="nb_NO">
-    <meta property="og:image" content="assets/images/og-montering.jpg">
+    <meta property="og:url" content="https://example.com/">
+    <meta property="og:image" content="https://example.com/assets/images/og-montering.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Møbelmontering og handyman i Østlandet | LILY Montering">
+    <meta
+      name="twitter:description"
+      content="Profesjonell møbelmontering og praktiske handyman-tjenester for bedrifter og private i Østlandet."
+    >
+    <meta name="twitter:image" content="https://example.com/assets/images/og-montering.jpg">
+    <meta name="theme-color" content="#12372a">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-    <link rel="preload" href="assets/images/skyvedorer-speil-soverom.jpg" as="image" fetchpriority="high">
+    <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link
+      rel="preload"
+      href="assets/images/skyvedorer-speil-soverom.webp"
+      as="image"
+      type="image/webp"
+      fetchpriority="high"
+    >
+    <script>document.documentElement.classList.add("js");</script>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "LILY Montering",
+        "description": "Møbelmontering og handyman-tjenester i Østlandet.",
+        "areaServed": {
+          "@type": "AdministrativeArea",
+          "name": "Østlandet"
+        },
+        "serviceType": [
+          "Møbelmontering",
+          "Kontormøbelmontering",
+          "Garderobemontering",
+          "Kjøkkenmontering",
+          "Handyman-tjenester"
+        ]
+      }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Hopp til innhold</a>
 
     <header class="site-header" aria-label="Hovednavigasjon">
       <a class="brand" href="#top" aria-label="LILY Montering">
-        <span class="brand-mark" aria-hidden="true">L</span>
-        <span>LILY Montering</span>
+        <img class="brand-logo" src="assets/favicon.svg" width="38" height="38" alt="">
+        <span>
+          <strong>LILY Montering</strong>
+          <small>Presis montering. Ryddig levert.</small>
+        </span>
       </a>
-      <nav class="nav-links" aria-label="Sidenavigasjon">
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-nav"
+        aria-label="Åpne meny"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+
+      <nav class="nav-links" id="primary-nav" aria-label="Sidenavigasjon">
         <a href="#tjenester">Tjenester</a>
         <a href="#kunder">Kunder</a>
         <a href="#arbeid">Arbeid</a>
+        <a href="#fordeler">Fordeler</a>
         <a href="#prosess">Prosess</a>
         <a href="#faq">FAQ</a>
+        <a href="#kontakt">Kontakt</a>
       </nav>
-      <a class="header-cta" href="#kontakt">Send forespørsel</a>
+
+      <div class="header-actions">
+        <a class="header-cta" href="#kontakt">Be om tilbud</a>
+      </div>
     </header>
 
     <main id="main">
       <section class="hero" id="top" aria-labelledby="hero-title">
-        <img
-          class="hero-image"
-          src="assets/images/skyvedorer-speil-soverom.jpg"
-          width="1275"
-          height="1700"
-          alt="Montert skyvedørsgarderobe med speil og sort ramme på soverom"
-          fetchpriority="high"
-          decoding="async"
-        >
+        <picture>
+          <source
+            type="image/webp"
+            srcset="assets/images/skyvedorer-speil-soverom-900.webp 900w, assets/images/skyvedorer-speil-soverom.webp 1275w"
+            sizes="100vw"
+          >
+          <img
+            class="hero-image"
+            src="assets/images/skyvedorer-speil-soverom.jpg"
+            width="1275"
+            height="1700"
+            alt="Montert skyvedørsgarderobe med speil og sort ramme på soverom"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </picture>
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">Møbelmontering og småjobber i Norge</p>
+          <p class="eyebrow">Møbelmontering og handyman-tjenester i Østlandet</p>
           <h1 id="hero-title">Presis montering når møblene må sitte riktig</h1>
           <p class="hero-copy">
             Ryddig og effektiv hjelp med kontormøbler, garderober, kjøkken, hyller,
-            TV-fester og små handyman-oppdrag hjemme eller på arbeidsplassen.
+            TV-fester og små monteringsting hjemme eller på arbeidsplassen.
           </p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#kontakt">Send forespørsel</a>
-            <a class="button button-secondary" href="#tjenester">Se tjenester</a>
+          <div class="hero-actions" aria-label="Hovedhandlinger">
+            <a class="button button-primary" href="#kontakt">Be om tilbud</a>
+            <a class="button button-secondary" href="#arbeid">Se utført arbeid</a>
           </div>
           <ul class="trust-list" aria-label="Viktige fordeler">
             <li>Holder avtalt tid</li>
             <li>Ryddig utførelse</li>
-            <li>Vanskelige detaljer løses</li>
+            <li>Løser vanskelige detaljer</li>
+            <li>Små jobber tas seriøst</li>
           </ul>
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Trygghet før bestilling">
+        <div>
+          <strong>Profesjonell</strong>
+          <span>Riktig verktøy, stødig montering og tydelig avklaring.</span>
+        </div>
+        <div>
+          <strong>Presis</strong>
+          <span>Skap, fronter, skinner og beslag justeres nøye.</span>
+        </div>
+        <div>
+          <strong>Praktisk</strong>
+          <span>Kontor, hjem, skole, barnehage og næringslokaler.</span>
         </div>
       </section>
 
       <section class="section section-intro" id="tjenester" aria-labelledby="services-title">
         <div class="section-heading">
           <p class="eyebrow">Tjenester</p>
-          <h2 id="services-title">Praktisk montering for hjem og arbeidsplass</h2>
+          <h2 id="services-title">Montering for hjem, kontor og lokaler</h2>
           <p>
             Fra en enkel hylle til større innredningsprosjekter: arbeidet planlegges
             nøkternt, utføres presist og avsluttes ryddig.
@@ -86,27 +182,27 @@
           <article class="service-card">
             <span class="service-number">01</span>
             <h3>Kontor, skole og næring</h3>
-            <p>Montering av kontorpulter, skap, reoler, møtebord og inventar for lokaler som skal raskt i bruk.</p>
+            <p>Kontorpulter, skap, reoler, møtebord og inventar for lokaler som skal raskt i bruk.</p>
           </article>
           <article class="service-card">
             <span class="service-number">02</span>
             <h3>Garderober og skyvedører</h3>
-            <p>Nøyaktig montering av skap, skinner, fronter, kurver og innredning, også der vegger og tak krever tilpasning.</p>
+            <p>Skap, skinner, fronter, kurver og innredning monteres med fokus på rette linjer og stabil bruk.</p>
           </article>
           <article class="service-card">
             <span class="service-number">03</span>
             <h3>Kjøkken og krevende skap</h3>
-            <p>Hjelp med avansert montering, hjørneskap, uttrekk, skyvesystemer og løsninger under skråtak eller mansard.</p>
+            <p>Hjelp med hjørneskap, uttrekk, skyvesystemer og løsninger under skråtak eller mansard.</p>
           </article>
           <article class="service-card">
             <span class="service-number">04</span>
             <h3>Møbler til private hjem</h3>
-            <p>Senger, kommoder, spisebord, skap, reoler og flatpakkede møbler monteres stabilt og uten unødvendig rot.</p>
+            <p>Senger, kommoder, spisebord, skap, reoler og flatpakkede møbler monteres stabilt.</p>
           </article>
           <article class="service-card">
             <span class="service-number">05</span>
             <h3>Veggmontering</h3>
-            <p>Bilder, speil, hyller, TV-braketter, gardinstenger og andre detaljer henges opp pent og sikkert.</p>
+            <p>Bilder, speil, hyller, TV-braketter, gardinstenger og andre detaljer henges opp pent.</p>
           </article>
           <article class="service-card">
             <span class="service-number">06</span>
@@ -120,7 +216,7 @@
         <div class="section-heading">
           <p class="eyebrow">Hvem vi hjelper</p>
           <h2 id="audience-title">Samme presisjon, ulik hverdag</h2>
-          <p>Bedrifter trenger tempo og forutsigbarhet. Private kunder trenger trygg hjelp hjemme. Begge deler krever god kommunikasjon.</p>
+          <p>Bedrifter trenger tempo og forutsigbarhet. Private kunder trenger trygg hjelp hjemme.</p>
         </div>
 
         <div class="audience-grid">
@@ -154,102 +250,66 @@
 
         <div class="gallery-grid">
           <figure class="gallery-card gallery-card-large">
-            <img
-              src="assets/images/garderobe-under-skratt-tak.jpg"
-              width="1125"
-              height="1500"
-              alt="Sort garderobe montert under skråtak med presis tilpasning mot lav takhøyde"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/garderobe-under-skratt-tak-900.webp 900w, assets/images/garderobe-under-skratt-tak.webp 1125w" sizes="(min-width: 981px) 50vw, 100vw">
+              <img src="assets/images/garderobe-under-skratt-tak.jpg" width="1125" height="1500" alt="Sort garderobe montert under skråtak med presis tilpasning mot lav takhøyde" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Garderobe under skråtak</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/apent-garderobesystem-med-kurver.jpg"
-              width="1125"
-              height="1500"
-              alt="Åpent hvitt garderobesystem med skuffer, kurver og hengestenger"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/apent-garderobesystem-med-kurver-900.webp 900w, assets/images/apent-garderobesystem-med-kurver.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/apent-garderobesystem-med-kurver.jpg" width="1125" height="1500" alt="Åpent hvitt garderobesystem med skuffer, kurver og hengestenger" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Åpent garderobesystem</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/tv-og-oppbevaringsvegg.jpg"
-              width="1125"
-              height="1500"
-              alt="Hvit oppbevaringsvegg bygget rundt TV med hyller og skyvedørsskinne"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/tv-og-oppbevaringsvegg-900.webp 900w, assets/images/tv-og-oppbevaringsvegg.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/tv-og-oppbevaringsvegg.jpg" width="1125" height="1500" alt="Hvit oppbevaringsvegg bygget rundt TV med hyller og skyvedørsskinne" loading="lazy" decoding="async">
+            </picture>
             <figcaption>TV- og oppbevaringsvegg</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/skyvedorsgarderobe-ved-trapp.jpg"
-              width="1125"
-              height="1500"
-              alt="Skyvedørsgarderobe med speil montert ved trapp og skrå vegg"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/skyvedorsgarderobe-ved-trapp-900.webp 900w, assets/images/skyvedorsgarderobe-ved-trapp.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/skyvedorsgarderobe-ved-trapp.jpg" width="1125" height="1500" alt="Skyvedørsgarderobe med speil montert ved trapp og skrå vegg" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Skyvedører ved trapp</figcaption>
           </figure>
           <figure class="gallery-card gallery-card-tall">
-            <img
-              src="assets/images/garderobe-med-varm-trebelysning.jpg"
-              width="1125"
-              height="1500"
-              alt="Garderobe i mørkt tre med skuffer og integrert varm belysning"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/garderobe-med-varm-trebelysning-900.webp 900w, assets/images/garderobe-med-varm-trebelysning.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/garderobe-med-varm-trebelysning.jpg" width="1125" height="1500" alt="Garderobe i mørkt tre med skuffer og integrert varm belysning" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Garderobe med belysning</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/brun-garderobe-innredning.jpg"
-              width="1125"
-              height="1500"
-              alt="Brun garderobeinnredning med skuffer, hyller og hengestenger"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/brun-garderobe-innredning-900.webp 900w, assets/images/brun-garderobe-innredning.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/brun-garderobe-innredning.jpg" width="1125" height="1500" alt="Brun garderobeinnredning med skuffer, hyller og hengestenger" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Innredning med skuffer</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/montert-garderoberom-sort.jpg"
-              width="1125"
-              height="1500"
-              alt="Sort garderoberom med åpne hyller og skuffer ferdig montert"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/montert-garderoberom-sort-900.webp 900w, assets/images/montert-garderoberom-sort.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/montert-garderoberom-sort.jpg" width="1125" height="1500" alt="Sort garderoberom med åpne hyller og skuffer ferdig montert" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Sort garderoberom</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/lys-tregarderobe-med-speil.jpg"
-              width="1125"
-              height="1500"
-              alt="Lys tregarderobe med speildør og høy skapfront montert på soverom"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/lys-tregarderobe-med-speil-900.webp 900w, assets/images/lys-tregarderobe-med-speil.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/lys-tregarderobe-med-speil.jpg" width="1125" height="1500" alt="Lys tregarderobe med speildør og høy skapfront montert på soverom" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Lys garderobe med speil</figcaption>
           </figure>
           <figure class="gallery-card">
-            <img
-              src="assets/images/sort-hyllesystem-montert.jpg"
-              width="1125"
-              height="1500"
-              alt="Sort hylle- og skapinnredning ferdig montert på hvit vegg"
-              loading="lazy"
-              decoding="async"
-            >
+            <picture>
+              <source type="image/webp" srcset="assets/images/sort-hyllesystem-montert-900.webp 900w, assets/images/sort-hyllesystem-montert.webp 1125w" sizes="(min-width: 981px) 25vw, 100vw">
+              <img src="assets/images/sort-hyllesystem-montert.jpg" width="1125" height="1500" alt="Sort hylle- og skapinnredning ferdig montert på hvit vegg" loading="lazy" decoding="async">
+            </picture>
             <figcaption>Hylle- og skapinnredning</figcaption>
           </figure>
         </div>
@@ -294,7 +354,7 @@
           <li>
             <span>01</span>
             <h3>Send kort beskrivelse</h3>
-            <p>Fortell hva som skal monteres, hvor jobben er, og legg gjerne ved bilder når kontaktkanalen er satt opp.</p>
+            <p>Fortell hva som skal monteres, hvor jobben er, og legg gjerne ved bilder etter første kontakt.</p>
           </li>
           <li>
             <span>02</span>
@@ -314,6 +374,15 @@
         </ol>
       </section>
 
+      <section class="quote-cta" aria-labelledby="quote-title">
+        <div>
+          <p class="eyebrow">Tilbud</p>
+          <h2 id="quote-title">Send noen linjer om jobben, så tar vi neste steg.</h2>
+          <p>Jo bedre beskrivelse, desto enklere er det å gi riktig vurdering av tid, verktøy og gjennomføring.</p>
+        </div>
+        <a class="button button-primary" href="#kontakt">Be om uforpliktende tilbud</a>
+      </section>
+
       <section class="section faq-section" id="faq" aria-labelledby="faq-title">
         <div class="section-heading">
           <p class="eyebrow">FAQ</p>
@@ -330,7 +399,7 @@
           </details>
           <details>
             <summary>Hva bør jeg sende for et godt estimat?</summary>
-            <p>Send gjerne produktlenke, antall møbler, romtype, adresseområde og bilder av vegger, gulv eller nisjer.</p>
+            <p>Send gjerne produktlenke, antall møbler, romtype, område og bilder av vegger, gulv eller nisjer etter første kontakt.</p>
           </details>
           <details>
             <summary>Kan dere hjelpe med skråtak og vanskelige hjørner?</summary>
@@ -349,9 +418,14 @@
             <p class="eyebrow">Kontakt</p>
             <h2 id="contact-title">Klar for å få jobben gjort?</h2>
             <p>
-              Send en kort forespørsel med hva du trenger hjelp til. Beskriv gjerne
-              møblene, rommet og ønsket tidspunkt, så blir det enklere å vurdere jobben.
+              Send en kort forespørsel med hva du trenger hjelp til. Bilder skal ikke
+              lastes opp i skjemaet nå, men kan sendes etter første kontakt via bekreftet kanal.
             </p>
+            <div class="contact-methods" aria-label="Direkte kontakt">
+              <span class="contact-method is-pending">Telefon legges inn før publisering</span>
+              <span class="contact-method is-pending">E-post legges inn før publisering</span>
+              <a class="contact-method" href="#contact-form">Be om tilbud i skjema</a>
+            </div>
             <ul class="contact-checklist">
               <li>Hva skal monteres eller henges opp?</li>
               <li>Hvor mange møbler eller rom gjelder det?</li>
@@ -359,20 +433,33 @@
             </ul>
           </div>
 
-          <!-- Integration point: connect this form to email, CRM, Netlify Forms, Formspree, or another lead endpoint before publishing. -->
-          <form class="lead-form" data-lead-form aria-describedby="form-note">
+          <form
+            class="lead-form"
+            id="contact-form"
+            action="contact.php"
+            method="post"
+            data-lead-form
+            aria-describedby="form-note form-status"
+            novalidate
+          >
+            <input type="hidden" name="started_at" value="" data-started-at>
+            <div class="honeypot" aria-hidden="true">
+              <label for="website">Nettside</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
             <div class="form-row">
               <label for="name">Navn</label>
-              <input id="name" name="name" type="text" autocomplete="name" required>
+              <input id="name" name="name" type="text" autocomplete="name" maxlength="80" required>
             </div>
             <div class="form-grid">
               <div class="form-row">
                 <label for="phone">Telefon</label>
-                <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="32" required>
               </div>
               <div class="form-row">
-                <label for="email">E-post</label>
-                <input id="email" name="email" type="email" autocomplete="email">
+                <label for="email">E-post <span>valgfritt</span></label>
+                <input id="email" name="email" type="email" autocomplete="email" maxlength="120">
               </div>
             </div>
             <div class="form-grid">
@@ -380,17 +467,17 @@
                 <label for="service">Hva gjelder det?</label>
                 <select id="service" name="service" required>
                   <option value="">Velg tjeneste</option>
-                  <option>Møbelmontering hjemme</option>
-                  <option>Kontor, skole eller næring</option>
-                  <option>Garderobe eller skyvedører</option>
-                  <option>Kjøkken eller avansert montering</option>
-                  <option>Henge opp TV, hyller eller speil</option>
-                  <option>Annet handyman-oppdrag</option>
+                  <option value="Møbelmontering hjemme">Møbelmontering hjemme</option>
+                  <option value="Kontor, skole eller næring">Kontor, skole eller næring</option>
+                  <option value="Garderobe eller skyvedører">Garderobe eller skyvedører</option>
+                  <option value="Kjøkken eller avansert montering">Kjøkken eller avansert montering</option>
+                  <option value="Henge opp TV, hyller eller speil">Henge opp TV, hyller eller speil</option>
+                  <option value="Annet handyman-oppdrag">Annet handyman-oppdrag</option>
                 </select>
               </div>
               <div class="form-row">
-                <label for="area">Område</label>
-                <input id="area" name="area" type="text" autocomplete="address-level2" placeholder="By / sted" required>
+                <label for="area">By eller område</label>
+                <input id="area" name="area" type="text" autocomplete="address-level2" maxlength="80" required>
               </div>
             </div>
             <div class="form-row">
@@ -399,23 +486,35 @@
                 id="message"
                 name="message"
                 rows="5"
+                maxlength="1500"
                 placeholder="Skriv hva som skal monteres, antall møbler og eventuelle vanskelige detaljer."
                 required
               ></textarea>
             </div>
-            <p class="form-note" id="form-note">Bilder kan sendes videre etter første kontakt når valgt kontaktløsning er koblet til.</p>
-            <button class="button button-primary form-button" type="submit">Send forespørsel</button>
-            <p class="form-status" role="status" aria-live="polite" hidden></p>
+            <label class="consent-row" for="privacy">
+              <input id="privacy" name="privacy" type="checkbox" value="1" required>
+              <span>Jeg samtykker til at opplysningene brukes for å svare på forespørselen.</span>
+            </label>
+            <p class="form-note" id="form-note">Skjemaet sender ikke filer. Fotografier kan avtales etter første kontakt.</p>
+            <button class="button button-primary form-button" type="submit">
+              <span class="button-label">Send forespørsel</span>
+              <span class="button-loading" hidden>Sender...</span>
+            </button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
           </form>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>© <span data-year></span> LILY Montering. Møbelmontering og handyman i Norge.</p>
-      <a href="#top">Til toppen</a>
+      <p>© <span data-year></span> LILY Montering. Møbelmontering og handyman i Østlandet.</p>
+      <div class="footer-links">
+        <a href="#top">Til toppen</a>
+        <a href="robots.txt">Robots</a>
+        <a href="sitemap.xml">Sitemap</a>
+      </div>
     </footer>
 
-    <a class="mobile-action" href="#kontakt">Send forespørsel</a>
+    <a class="mobile-action" href="#kontakt">Be om tilbud</a>
   </body>
 </html>
