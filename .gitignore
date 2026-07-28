@@ -1,0 +1,8 @@
+# Raw uploaded photo archive and originals.
+foto.zip
+foto/
+
+# OS/editor noise.
+.DS_Store
+Thumbs.db
+.vscode/
