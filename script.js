@@ -1,3 +1,6 @@
+document.documentElement.classList.remove("no-js");
+document.documentElement.classList.add("js");
+
 const yearNode = document.querySelector("[data-year]");
 const menuToggle = document.querySelector(".menu-toggle");
 const primaryNav = document.querySelector("#primary-nav");

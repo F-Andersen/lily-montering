@@ -161,9 +161,12 @@ To replace images:
 - cache headers
 - Gzip/Brotli where supported
 - protection of `config.php`
+- Content Security Policy without `unsafe-eval`
 - 404 handler
 
 HTTPS redirect is included but commented out. Enable it only after SSL is active and the site works over HTTPS.
+
+The CSP allows the inline JSON-LD block by SHA-256 hash. If you edit the JSON-LD script in `index.html`, update the matching hash in `.htaccess`. Do not add `unsafe-eval`.
 
 ## Remaining placeholders
 
