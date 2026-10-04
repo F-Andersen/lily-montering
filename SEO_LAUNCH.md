@@ -6,6 +6,12 @@
 була заблокована. Після backup і перевірки встановити public_domain=https://fiksitt.online
 та seo_indexable=1; перевірити robots.txt і X-Robots-Tag зовнішнім HTTP-тестом.
 
+Результат релізу: код `1e83d50` опублікований на GitHub main і VPS.
+Індексацію ввімкнено; зовнішній tests/seo-public-http.cjs пройшов для 8 URL.
+Попередні дані й SMTP збережено. Backup-пакети та старий образ: CODEX_HANDOFF.md.
+Search Console, Business Profile і підтвердження реальних бізнес-контактів
+залишаються окремими завданнями; польові Core Web Vitals ще не виміряні.
+
 ## Що реалізовано
 
 - Норвезькі title/description для головної, каталогу та кожної послуги.

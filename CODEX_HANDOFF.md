@@ -24,6 +24,17 @@
 
 ### SEO-реліз, 2026-10-05
 
+Опубліковано: код `1e83d50`, GitHub `main`, VPS 188.137.232.136.
+Пакет: `/opt/lily-montering/releases/fiksitt-seo-20261005T010956.tar.gz`.
+Backup: `/opt/lily-montering/backups/fiksitt-seo-20261005T010956/` — source.tar.gz,
+database.sql, private-photos.tar.gz, image-id.txt, state.json, env.sha256.
+Старий образ: `fiksitt:before-fiksitt-seo-20261005T010956`.
+Зовнішній SEO HTTP-тест пройшов для 8 сторінок. public_domain встановлено
+на https://fiksitt.online, seo_indexable=1; robots Allow: /, canonical HTTPS.
+До активації SEO перевірено незмінність усіх попередніх рядків БД і файлів.
+Серверний assets/uploads/.htaccess збережено з backup; його не перезаписувати
+при наступному deploy. .env, SMTP, акаунти, заявки й фото збережені.
+
 - Sitemap прибрано з футера; /sitemap.php -> 301 /sitemap.xml.
 - Футер має Alle tjenester -> /tjenester для crawlable внутрішніх посилань.
 - Головна: WebSite/WebPage/LocalBusiness і каталог чотирьох реальних послуг.
