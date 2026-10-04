@@ -45,6 +45,15 @@ function service_metadata(array $service): array
     ];
 }
 
+function home_metadata(): array
+{
+    $s = settings();
+    return [
+        'title' => $s['home_seo_title'] ?: 'Møbelmontering og handyman i ' . $s['service_region'] . ' | ' . $s['company_name'],
+        'description' => $s['home_seo_description'] ?: 'Hjelp med garderober, IKEA-, Bohus- og JYSK-møbler i ' . $s['service_region'] . '. Montering, levering og bortkjøring av emballasje. Send bilder for et uforpliktende tilbud.',
+    ];
+}
+
 function breadcrumb_schema(array $items): array
 {
     $elements = [];

@@ -18,6 +18,23 @@ function business_schema(): array
     return $schema;
 }
 
+function home_schema(array $metadata): array
+{
+    $business = business_schema();
+    $base = absolute_url();
+    $offers = [];
+    foreach (array_slice(home_service_offers(), 0, 4) as $offer) {
+        $offers[] = ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => $offer, 'provider' => ['@id' => $base . '#business'], 'areaServed' => settings()['service_region']]];
+    }
+    $business['hasOfferCatalog'] = ['@type' => 'OfferCatalog', 'name' => 'Tjenester', 'itemListElement' => $offers];
+    unset($business['@context']);
+    return ['@context' => 'https://schema.org', '@graph' => [
+        $business,
+        ['@type' => 'WebSite', '@id' => $base . '#website', 'url' => $base, 'name' => settings()['company_name'], 'inLanguage' => 'nb-NO', 'publisher' => ['@id' => $base . '#business']],
+        ['@type' => 'WebPage', '@id' => $base . '#webpage', 'url' => $base, 'name' => seo_text($metadata['title'], 160), 'description' => seo_text($metadata['description']), 'inLanguage' => 'nb-NO', 'isPartOf' => ['@id' => $base . '#website'], 'about' => ['@id' => $base . '#business']],
+    ]];
+}
+
 function public_head(string $title, string $description, string $path = '', ?array $schema = null, bool $hero = false, string $image = 'assets/images/og-montering.webp', string $imageAlt = 'Møbelmontering og handyman', bool $allowIndex = true): void
 {
     $json = security_headers($schema, $hero);
@@ -39,9 +56,9 @@ function public_head(string $title, string $description, string $path = '', ?arr
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="<?= e($title) ?>"><meta name="twitter:description" content="<?= e($description) ?>">
 <meta name="theme-color" content="#fafaf8"><link rel="icon" href="<?= e(url('assets/fiksitt-icon-v2-32.png')) ?>" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="<?= e(url('assets/fiksitt-icon-v2-180.png')) ?>"><link rel="manifest" href="<?= e(url('site.webmanifest?v=3')) ?>">
 <?php if ($hero): ?><link rel="preload" href="<?= e(url('assets/images/og-montering.webp')) ?>" imagesrcset="<?= e(url('assets/images/og-montering-900.webp')) ?> 900w, <?= e(url('assets/images/og-montering.webp')) ?> 1200w" imagesizes="100vw" as="image" type="image/webp" fetchpriority="high"><?php endif ?>
-<link rel="stylesheet" href="<?= e(url('styles.css?v=20261005-3')) ?>"><script src="<?= e(url('script.js?v=20261005')) ?>" defer></script><?php if ($hero): ?><script src="<?= e(url('gallery.js?v=20261005')) ?>" defer></script><?php endif ?>
+<link rel="stylesheet" href="<?= e(url('styles.css?v=client-20261005-2')) ?>"><script src="<?= e(url('script.js?v=client-20261005-2')) ?>" defer></script><?php if ($hero): ?><script src="<?= e(url('gallery.js?v=20261005')) ?>" defer></script><?php endif ?>
 <?php if ($json !== ''): ?><script type="application/ld+json"><?= $json ?></script><?php endif ?>
-</head><body><a class="skip-link" href="#main">Hopp til innhold</a>
+</head><body class="public-site"><a class="skip-link" href="#main">Hopp til innhold</a>
 <?php
 }
 
@@ -51,8 +68,8 @@ function public_header(): void
     ?><header class="site-header" aria-label="Hovednavigasjon">
 <a class="brand" href="<?= e(url()) ?>" aria-label="<?= e($s['company_name']) ?>"><img class="brand-logo" src="<?= e(url('assets/fiksitt-wordmark-v2.webp')) ?>" width="720" height="300" alt=""><span class="sr-only"><strong><?= e($s['company_name']) ?></strong></span></a>
 <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Åpne meny"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
-<nav class="nav-links" id="primary-nav" aria-label="Sidenavigasjon"><a href="<?= e(service_url()) ?>">Tjenester</a><a href="<?= e(url('#arbeid')) ?>">Arbeid</a><a href="<?= e(url('#omtaler')) ?>">Omtaler</a><a href="<?= e(url('#prosess')) ?>">Prosess</a><a href="<?= e(url('#faq')) ?>">FAQ</a><a href="<?= e(url('#kontakt')) ?>">Kontakt</a></nav>
-<div class="header-actions"><?php if ($s['phone']): ?><a class="contact-pill" href="tel:<?= e(preg_replace('/[^0-9+]/', '', $s['phone'])) ?>">Ring oss</a><?php endif ?><a class="header-cta" href="<?= e(url('#kontakt')) ?>"><?= e($s['primary_cta']) ?></a></div></header>
+<nav class="nav-links" id="primary-nav" aria-label="Sidenavigasjon"><a href="<?= e(url('#kontakt')) ?>">Kontakt oss</a><a href="<?= e(url('#om-oss')) ?>">Om oss</a><a href="<?= e(url('#tjenester')) ?>">Tjenester</a></nav>
+<div class="header-actions"><?php if ($s['phone']): ?><a class="contact-pill" href="tel:<?= e(preg_replace('/[^0-9+]/', '', $s['phone'])) ?>">Ring oss</a><?php endif ?><a class="header-cta" href="<?= e(url('#contact-form')) ?>" data-order-open>Bestill nå</a></div></header>
 <?php
 }
 
@@ -60,8 +77,8 @@ function public_footer(): void
 {
     $s = settings();
     ?><footer class="site-footer"><p>© <?= date('Y') ?> <?= e($s['company_name']) ?>. Møbelmontering og handyman i <?= e($s['service_region']) ?>.<?php if ($s['organization_number']): ?> Org.nr. <?= e($s['organization_number']) ?><?php endif ?></p>
-<div class="footer-links"><a href="<?= e(service_url()) ?>">Tjenester</a><a href="<?= e(url('#omtaler')) ?>">Omtaler</a><a href="<?= e(url('#kontakt')) ?>">Kontakt</a><a href="<?= e(url('sitemap.php')) ?>">Sitemap</a><?php if ($s['social_url']): ?><a href="<?= e($s['social_url']) ?>" rel="noopener">Sosiale medier</a><?php endif ?></div></footer>
-<a class="mobile-action" href="<?= e(url('#kontakt')) ?>"><?= e($s['primary_cta']) ?></a></body></html>
+<div class="footer-links"><a href="<?= e(service_url()) ?>">Alle tjenester</a><a href="<?= e(url('#om-oss')) ?>">Om oss</a><a href="<?= e(url('#omtaler')) ?>">Anmeldelser</a><a href="<?= e(url('#kontakt')) ?>">Kontakt oss</a><?php if ($s['social_url']): ?><a href="<?= e($s['social_url']) ?>" rel="noopener">Sosiale medier</a><?php endif ?></div></footer>
+<a class="mobile-action" href="<?= e(url('#contact-form')) ?>" data-order-open>Bestill nå</a></body></html>
 <?php
 }
 

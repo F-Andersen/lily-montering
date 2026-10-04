@@ -23,11 +23,11 @@ function public_reviews(bool &$available): array
 function reviews_section(array $reviews, bool $available): void
 {
     ?><section class="section reviews-section" id="omtaler" aria-labelledby="reviews-title">
-<div class="reviews-heading"><div><p class="eyebrow">Fra kundene</p><h2 id="reviews-title">Kundeomtaler</h2></div>
+<div class="reviews-heading"><div><p class="eyebrow">Fra kundene</p><h2 id="reviews-title">Anmeldelser</h2></div>
 <a class="service-link" href="<?= e(url('#arbeid')) ?>">Se utført arbeid →</a></div>
 <?php if (!$reviews): ?>
 <div class="reviews-empty"><p><?= $available ? 'Ingen kundeomtaler publisert ennå.' : 'Kundeomtaler er midlertidig utilgjengelige.' ?></p>
-<a class="button button-primary" href="<?= e(url('#kontakt')) ?>"><?= e(settings()['primary_cta']) ?></a></div>
+<a class="button button-primary" href="<?= e(url('#contact-form')) ?>" data-order-open>Bestill nå</a></div>
 <?php if ($available): ?>
 <figure class="review-demo" aria-label="Demonstrasjon, ikke en ekte kundeomtale">
 <?= image_html('assets/images/hvitt-garderoberom.webp', 'Montert hvitt garderoberom fra vårt arbeidsfotogalleri', '', true, '(max-width: 680px) 100vw, 400px') ?>

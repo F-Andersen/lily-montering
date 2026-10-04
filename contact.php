@@ -66,12 +66,18 @@ $phone = normalize_phone($fields['phone'], $phoneCountry);
 if ($phone === null || isset($errors['phone_country'])) $errors['phone'] = 'Skriv et gyldig telefonnummer med riktig landskode.';
 else $fields['phone'] = $phone;
 if (!in_array($fields['service'], contact_services(), true)) $errors['service'] = 'Velg en gyldig tjeneste.';
+$productUrl = read_field('product_url', 2048, false, $errors);
+if ($productUrl !== '' && (!filter_var($productUrl, FILTER_VALIDATE_URL) || !in_array(strtolower(parse_url($productUrl, PHP_URL_SCHEME) ?: ''), ['https', 'http'], true))) {
+    $errors['product_url'] = 'Skriv en gyldig lenke som begynner med https:// eller http://.';
+}
 if (mb_strlen($fields['message'], 'UTF-8') < 20) $errors['message'] = 'Skriv litt mer om oppdraget.';
 if (($_POST['privacy'] ?? '') !== '1') $errors['privacy'] = 'Samtykke må bekreftes.';
 $uploads = [];
 try { $uploads = request_photo_uploads(); }
 catch (InvalidArgumentException $error) { $errors['photos'] = $error->getMessage(); }
 if ($errors) json_response(422, false, 'Kontroller feltene og prøv igjen.', ['errors' => $errors]);
+// Store the optional link in the enquiry text so existing admin/mail views retain it.
+if ($productUrl !== '') $fields['message'] .= "\n\nProduktlenke: " . $productUrl;
 
 $id = null;
 $photos = [];

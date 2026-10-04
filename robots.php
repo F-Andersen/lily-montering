@@ -7,5 +7,5 @@ header('X-Robots-Tag: noindex');
 echo "User-agent: *\n";
 if (!seo_indexable()) { echo "Disallow: /\n"; exit; }
 echo "Allow: /\n";
-foreach (['admin/', 'app/', 'database/', 'tests/', 'foto/'] as $path) echo 'Disallow: ' . url($path) . "\n";
+foreach (array_unique([admin_path() . '/', 'admin/', 'app/', 'database/', 'tests/', 'tools/', 'foto/']) as $path) echo 'Disallow: ' . app_path() . '/' . $path . "\n";
 echo 'Sitemap: ' . absolute_url(config()['pretty_urls'] ? 'sitemap.xml' : 'sitemap.php') . "\n";

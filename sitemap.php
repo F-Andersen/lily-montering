@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/app/seo.php';
+if (config()['pretty_urls']) public_alias_redirect('sitemap.xml', ['sitemap.php']);
 header('Content-Type: application/xml; charset=UTF-8');
 header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex');

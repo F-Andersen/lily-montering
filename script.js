@@ -8,6 +8,34 @@ const leadForm = document.querySelector("[data-lead-form]");
 const mobileAction = document.querySelector(".mobile-action");
 const contactSection = document.querySelector("#kontakt");
 const siteHeader = document.querySelector(".site-header");
+const orderDialog = document.querySelector("#order-dialog");
+const orderHome = document.querySelector("[data-order-home]");
+
+if (orderDialog && orderHome && leadForm && typeof orderDialog.showModal === "function") {
+  let orderOpener = null;
+  document.querySelectorAll("[data-order-open]").forEach(link => link.addEventListener("click", event => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    closeMenu();
+    orderOpener = link;
+    // Move the one existing form, preserving entered text, files and validation.
+    orderDialog.querySelector("[data-order-form-slot]").append(leadForm);
+    orderDialog.showModal();
+    document.body.classList.add("order-open");
+    leadForm.querySelector("#name")?.focus();
+  }));
+  orderDialog.querySelector("[data-order-close]").addEventListener("click", () => orderDialog.close());
+  orderDialog.addEventListener("close", () => {
+    orderHome.append(leadForm);
+    document.body.classList.remove("order-open");
+    orderOpener?.focus({ preventScroll: true });
+  });
+  orderDialog.addEventListener("click", event => {
+    if (event.target !== orderDialog) return;
+    const rect = orderDialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) orderDialog.close();
+  });
+}
 
 if (siteHeader && "ResizeObserver" in window) {
   new ResizeObserver(() => {

@@ -9,12 +9,13 @@ public_alias_redirect($_GET ? '?' . http_build_query($_GET) : '', ['index.php', 
 $s = settings();
 $available = true;
 $services = public_services($available);
-$featured = array_slice(array_values(array_filter($services, static fn($r) => (bool)$r['featured'])), 0, 6);
+$offers = home_service_offers();
 $gallery = public_gallery();
 $reviewsAvailable = true;
 $reviews = public_reviews($reviewsAvailable);
 $selectedService = is_string($_GET['service'] ?? null) ? $_GET['service'] : '';
-public_head($s['home_seo_title'] ?: 'Møbelmontering og handyman i ' . $s['service_region'] . ' | ' . $s['company_name'], $s['home_seo_description'] ?: 'Møbelmontering, garderober, kjøkken og veggmontering i ' . $s['service_region'] . '. Praktisk hjelp for hjem og bedrifter. Be om et uforpliktende tilbud.', '', business_schema(), true, allowIndex: $available);
+$metadata = home_metadata();
+public_head($metadata['title'], $metadata['description'], '', home_schema($metadata), true, allowIndex: $available);
 public_header();
 ?>
 <main id="main">
@@ -37,14 +38,15 @@ public_header();
         </picture>
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow"><?= e($s['company_name']) ?> · Din lokale handyman</p>
-          <h1 id="hero-title">Møbelmontering<br>for hjemmet ditt.</h1>
+          <p class="eyebrow">Din lokale handyman i <?= e($s['service_region']) ?></p>
+          <h1 id="hero-title"><?= e($s['company_name']) ?></h1>
+          <p class="hero-slogan">Har du kjøpt nytt skap? Jeg hjelper deg med montering!</p>
           <p class="hero-copy">
-            Fra garderoben til den siste hyllen. Vi monterer møbler og løser
-            praktiske oppgaver hjemme og på jobb i <?= e($s['service_region']) ?>.
+            Nøyaktig og ryddig montering av garderober og møbler,
+            med praktisk hjelp for både private og bedrifter.
           </p>
           <div class="hero-actions" aria-label="Hovedhandlinger">
-            <a class="button button-primary" href="#kontakt"><?= e($s['primary_cta']) ?></a>
+            <a class="button button-primary" href="#contact-form" data-order-open>Bestill nå</a>
             <a class="button button-secondary" href="#arbeid">Se utført arbeid</a>
           </div>
           <p class="hero-note">Nøyaktig montert. Ryddig levert.</p>
@@ -76,78 +78,49 @@ public_header();
 
       <?php gallery_section($gallery); ?>
 
-      <section class="section section-intro" id="tjenester" aria-labelledby="services-title">
+      <section class="section client-services" id="tjenester" aria-labelledby="services-title">
         <div class="section-heading">
           <p class="eyebrow">Tjenester</p>
-          <h2 id="services-title">Montering for hjem, kontor og lokaler</h2>
-          <p>
-            Fra en enkel hylle til større innredningsprosjekter: arbeidet planlegges
-            nøkternt, utføres presist og avsluttes ryddig.
-          </p>
+          <h2 id="services-title">Fra nye møbler<br>til ferdig montert.</h2>
+          <p>Velg hjelpen du trenger. Omfang og pris avklares før oppdraget starter.</p>
         </div>
-
-        <div class="service-grid"><?php foreach ($featured as $service) service_card($service); ?></div>
-        <p class="section-action"><a class="service-link" href="<?= e(service_url()) ?>">Se alle tjenester →</a></p>
+        <ol class="service-offers">
+          <?php foreach ($offers as $index => $offer): ?>
+          <li class="service-offer">
+            <span class="offer-number" aria-hidden="true"><?= sprintf('%02d', $index + 1) ?></span>
+            <div><h3><?= e($offer) ?></h3>
+            <?php if ($index === 4): ?><a class="button button-primary" href="#contact-form" data-order-open>Bestill nå</a><?php endif ?>
+            </div>
+          </li>
+          <?php endforeach ?>
+        </ol>
       </section>
 
-      <section class="section audience-section" id="kunder" aria-labelledby="audience-title">
-        <div class="section-heading">
-          <p class="eyebrow">Hvem vi hjelper</p>
-          <h2 id="audience-title">Samme presisjon, ulik hverdag</h2>
-          <p>Bedrifter trenger tempo og forutsigbarhet. Private kunder trenger trygg hjelp hjemme.</p>
+      <section class="section about-section" id="om-oss" aria-labelledby="about-title">
+        <div class="about-intro">
+          <p class="eyebrow">Om oss</p>
+          <h2 id="about-title">Trenger du hjelp til montering av møbler?</h2>
+          <p>Jeg er en erfaren og pålitelig montør med lang erfaring innen montering av alle typer møbler, fra enkle hjemmemøbler til komplekse løsninger for både private og bedrifter.</p>
+          <?= image_html('assets/images/hvitt-garderoberom.webp', 'Ferdig montert garderobe med speildører', 'about-image', true, '(max-width: 980px) 85vw, 480px') ?>
         </div>
-
-        <div class="audience-grid">
-          <article class="audience-panel">
-            <h3>For bedrifter</h3>
-            <p>Effektiv montering for kontor, skole, barnehage, møterom og kommersielle interiører.</p>
-            <ul>
-              <li>Planlagt gjennomføring med minst mulig avbrudd</li>
-              <li>Flere møbler og rom kan tas samlet</li>
-              <li>God orden på emballasje og arbeidsområde</li>
-            </ul>
-          </article>
-          <article class="audience-panel">
-            <h3>For private</h3>
-            <p>Hjelp med møbler, garderober, kjøkkenmoduler og små monteringsting som må bli riktig første gang.</p>
-            <ul>
-              <li>Gjerne små oppdrag og enkeltmøbler</li>
-              <li>Tilpasning ved skråtak, hjørner og trange rom</li>
-              <li>Ryddig arbeid i hjemmet ditt</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <?php reviews_section($reviews, $reviewsAvailable); ?>
-
-      <section class="section proof-section" id="fordeler" aria-labelledby="proof-title">
-        <div class="proof-copy">
-          <p class="eyebrow">Hvorfor velge oss</p>
-          <h2 id="proof-title">Nøyaktig arbeid uten unødvendig styr</h2>
-          <p>
-            God montering handler om mer enn å få delene sammen. Det handler om å
-            lese rommet, bruke riktig feste, justere fronter og avslutte slik at
-            resultatet tåler hverdagen.
-          </p>
-        </div>
-        <div class="proof-list" aria-label="Fordeler">
-          <article>
-            <h3>Presisjon</h3>
-            <p>Skap, fronter, skinner og beslag justeres med fokus på rette linjer og stabil bruk.</p>
-          </article>
-          <article>
-            <h3>Ryddighet</h3>
-            <p>Arbeidsområdet holdes oversiktlig, og emballasje samles opp etter avtale.</p>
-          </article>
-          <article>
-            <h3>Punktlighet</h3>
-            <p>Avtalt tid respekteres, og eventuelle avklaringer tas før arbeidet starter.</p>
-          </article>
-          <article>
-            <h3>Problemløsing</h3>
-            <p>Vanskelige hjørner, mansard, skjeve vegger og trange rom håndteres praktisk.</p>
-          </article>
+        <div class="about-details">
+          <h3>Hva jeg kan hjelpe deg med</h3>
+          <ul>
+            <li>Skyvedørsgarderober og innebygde løsninger med ulike vanskelighetsgrader</li>
+            <li>Kontormøbler: elektriske heve-/senkebord, kontorstoler og seksjoner</li>
+            <li>Montering av kjøkken</li>
+            <li>Veggmontering: TV-oppheng, hyller, speil og bilder</li>
+            <li>Møbler fra Bohus, JYSK og andre leverandører</li>
+            <li>IKEA-møbler: PAX-garderober, BESTÅ, HEMNES og andre serier</li>
+          </ul>
+          <h3>Hvorfor velge meg?</h3>
+          <ul>
+            <li>Høy kvalitet og nøyaktighet i arbeidet</li>
+            <li>Profesjonelt verktøy og riktig innfesting for dine vegger</li>
+            <li>Ryddig, pålitelig og møter til avtalt tid</li>
+            <li>Tar vare på boligen din og rydder opp etter arbeidet</li>
+          </ul>
+          <p class="about-business">Arbeidet utføres offisielt via registrert enkeltpersonforetak (ENK). Du mottar faktura eller kvittering for oppdraget. Betaling kan gjøres via Vipps eller bankoverføring.</p>
         </div>
       </section>
 
@@ -186,7 +159,7 @@ public_header();
           <h2 id="quote-title">Send noen linjer om jobben, så tar vi neste steg.</h2>
           <p>Jo bedre beskrivelse, desto enklere er det å gi riktig vurdering av tid, verktøy og gjennomføring.</p>
         </div>
-        <a class="button button-primary" href="#kontakt">Be om uforpliktende tilbud</a>
+        <a class="button button-primary" href="#contact-form" data-order-open>Bestill nå</a>
       </section>
 
       <section class="section faq-section" id="faq" aria-labelledby="faq-title">
@@ -221,7 +194,7 @@ public_header();
       <section class="contact-section" id="kontakt" aria-labelledby="contact-title">
         <div class="contact-inner">
           <div class="contact-copy">
-            <p class="eyebrow">Kontakt</p>
+            <p class="eyebrow">Kontakt oss</p>
             <h2 id="contact-title">Klar for å få jobben gjort?</h2>
             <p>
               Beskriv hva du trenger hjelp til, hvor jobben er, og legg gjerne ved
@@ -230,7 +203,7 @@ public_header();
             <div class="contact-methods" aria-label="Direkte kontakt">
               <?php if ($s['phone']): ?><a class="contact-method" href="tel:<?= e(preg_replace('/[^0-9+]/', '', $s['phone'])) ?>">Ring oss: <?= e($s['phone']) ?></a><?php endif ?>
               <?php if ($s['email']): ?><a class="contact-method" href="mailto:<?= e($s['email']) ?>"><?= e($s['email']) ?></a><?php endif ?>
-              <a class="contact-method" href="#contact-form"><?= e($s['primary_cta']) ?> i skjema</a>
+              <a class="contact-method" href="#contact-form" data-order-open>Bestill nå</a>
             </div>
             <ul class="contact-checklist">
               <li>Hva skal monteres eller henges opp?</li>
@@ -239,6 +212,7 @@ public_header();
             </ul>
           </div>
 
+          <div class="contact-form-home" data-order-home>
           <form
             class="lead-form"
             id="contact-form"
@@ -280,7 +254,9 @@ public_header();
                 <label for="service">Hva gjelder det?</label>
                 <select id="service" name="service" required>
                   <option value="">Velg tjeneste</option>
-                  <?php foreach (contact_services() as $title): ?><option value="<?= e($title) ?>" <?= $selectedService === $title ? 'selected' : '' ?>><?= e($title) ?></option><?php endforeach ?>
+                  <?php foreach (enquiry_service_options() as $title => $label): ?><option value="<?= e($title) ?>" <?= $selectedService === $title ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach ?>
+                  <?php if ($selectedService !== '' && $selectedService !== 'Annet handyman-oppdrag' && !isset(enquiry_service_options()[$selectedService]) && in_array($selectedService, contact_services(), true)): ?><option value="<?= e($selectedService) ?>" selected><?= e($selectedService) ?></option><?php endif ?>
+                  <option value="Annet handyman-oppdrag" <?= $selectedService === 'Annet handyman-oppdrag' ? 'selected' : '' ?>>Annet oppdrag</option>
                 </select>
               </div>
               <div class="form-row">
@@ -299,6 +275,10 @@ public_header();
                 placeholder="Skriv hva som skal monteres, antall møbler og eventuelle vanskelige detaljer."
                 required
               ></textarea>
+            </div>
+            <div class="form-row">
+              <label for="product-url">Lenke til møblene <span>valgfritt</span></label>
+              <input id="product-url" name="product_url" type="url" inputmode="url" maxlength="2048" placeholder="https://" autocomplete="off">
             </div>
             <div class="form-row photo-field">
               <label for="photos">Bilder <span>valgfritt</span></label>
@@ -319,7 +299,16 @@ public_header();
             </button>
             <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
           </form>
+          </div>
         </div>
       </section>
+      <?php reviews_section($reviews, $reviewsAvailable); ?>
+      <dialog class="order-dialog" id="order-dialog" aria-labelledby="order-title">
+        <div class="order-dialog-heading">
+          <div><p class="eyebrow">Uforpliktende forespørsel</p><h2 id="order-title">Bestill nå</h2></div>
+          <button class="gallery-icon" type="button" data-order-close aria-label="Lukk skjema" title="Lukk skjema"><img src="<?= e(url('assets/icons/x.svg')) ?>" alt="" width="22" height="22"></button>
+        </div>
+        <div data-order-form-slot></div>
+      </dialog>
     </main>
 <?php public_footer(); ?>

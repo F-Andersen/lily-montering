@@ -31,11 +31,31 @@ function public_gallery(): array
     }
 }
 
+function home_service_offers(): array
+{
+    return [
+        'Montering av ditt nye garderobeskap eller andre møbler',
+        'Levering og montering av ditt nye garderobeskap eller møbler',
+        'Levering og montering av ditt nye garderobeskap eller møbler, samt bortkjøring av emballasje og avfall',
+        'Handymantjenester og praktisk hjelp i hjemmet',
+        'Send gjerne et bilde eller en lenke til møblene for et uforpliktende pristilbud',
+    ];
+}
+
+function enquiry_service_options(): array
+{
+    return array_combine(array_slice(home_service_offers(), 0, 4), [
+        'Montering av møbler', 'Levering og montering',
+        'Levering, montering og bortkjøring', 'Handymantjenester',
+    ]);
+}
+
 function contact_services(): array
 {
     $available = true;
     $titles = array_column(public_services($available), 'title');
-    return [...array_values(array_unique($titles)), 'Annet handyman-oppdrag'];
+    // Keep legacy service-page enquiries valid while exposing the new offers.
+    return [...array_values(array_unique([...array_keys(enquiry_service_options()), ...$titles])), 'Annet handyman-oppdrag'];
 }
 
 function service_media(array $service): array

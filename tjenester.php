@@ -44,7 +44,7 @@ $visible = array_values(array_filter($services, static fn($r) => $category === '
 $items = [];
 foreach ($visible as $r) $items[] = ['@type' => 'ListItem', 'position' => count($items) + 1, 'url' => absolute_url(service_canonical_path($r['slug'])), 'name' => $r['title']];
 $schema = ['@context' => 'https://schema.org', '@graph' => [['@type' => 'ItemList', 'itemListElement' => $items], breadcrumb_schema(['' => 'Forside', service_canonical_path() => 'Tjenester'])]];
-public_head('Tjenester for hjem og næring | ' . $s['company_name'], 'Møbelmontering, garderober, kjøkken, veggmontering og handyman-tjenester i ' . $s['service_region'] . '. Finn riktig tjeneste og be om tilbud.', service_canonical_path(), $schema);
+public_head('Møbelmontering og handyman-tjenester i ' . $s['service_region'] . ' | ' . $s['company_name'], 'Møbelmontering, garderober, kjøkken, veggmontering og handyman-tjenester i ' . $s['service_region'] . '. Finn riktig tjeneste og be om tilbud.', service_canonical_path(), $schema, allowIndex: $category === '');
 public_header();
 ?>
 <main id="main"><section class="section catalog-section"><div class="section-heading"><p class="eyebrow">Tjenester</p><h1>Montering for hjem, kontor og lokaler</h1><p>Fra en enkel hylle til større innredningsprosjekter. Finn hjelpen som passer oppdraget ditt.</p></div>

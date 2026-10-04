@@ -16,7 +16,7 @@ async function main() {
     assert(!response.headers.get('content-security-policy').includes('unsafe-eval'));
     if (route === '/' || route.startsWith('/tjenester')) {
       assert.match(html, /fiksitt-wordmark-v2\.webp/);
-      assert.match(html, /styles\.css\?v=20261005-3/);
+      assert.match(html, /styles\.css\?v=client-20261005-2/);
       const json = html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)?.[1];
       if (json) {
         assert(response.headers.get('content-security-policy').includes('sha256-' + crypto.createHash('sha256').update(json).digest('base64')));
@@ -29,6 +29,18 @@ async function main() {
       assert.match(html, /data-gallery/);
       assert.match(html, /id="omtaler"/);
       assert.match(html, /name="csrf"/);
+      assert.match(html, /Har du kjøpt nytt skap\? Jeg hjelper deg med montering!/);
+      assert.match(html, /name="product_url"/);
+      assert.match(html, /id="order-dialog"/);
+      assert.match(html, /id="om-oss"/);
+      assert.match(html, /Vipps eller bankoverføring/);
+      assert.equal((html.match(/class="service-offer"/g) || []).length, 5);
+      const offers = html.match(/<ol class="service-offers">([^]*?)<\/ol>/)[1];
+      assert.equal((offers.match(/<a /g) || []).length, 1, 'Only the last service offer has an action');
+      assert(html.indexOf('id="omtaler"') > html.indexOf('id="kontakt"'), 'Reviews are at the bottom');
+      const nav = html.match(/<nav class="nav-links"[^]*?<\/nav>/)[0];
+      assert.equal((nav.match(/<a /g) || []).length, 3);
+      assert.match(nav, /Kontakt oss[^]*?Om oss[^]*?Tjenester/);
       assert.match(html, /data-gallery-page/);
       const photoCount = (html.match(/data-gallery-open=/g) || []).length;
       assert(photoCount > 0);
@@ -36,11 +48,14 @@ async function main() {
       assert(html.indexOf('id="arbeid"') < html.indexOf('id="tjenester"'), 'Portfolio follows hero benefits');
       assert.match(html, /og-montering-900\.webp[^]*?900w/);
       assert.match(html, /width="1200"[^]*?height="630"/);
-      assert.equal(JSON.parse(html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1]).logo, base + '/assets/fiksitt-wordmark-v2.webp');
+      const graph = JSON.parse(html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1])['@graph'];
+      assert.equal(graph.find(node => node['@type'] === 'LocalBusiness').logo, base + '/assets/fiksitt-wordmark-v2.webp');
+      assert.equal(graph.find(node => node['@type'] === 'LocalBusiness').hasOfferCatalog.itemListElement.length, 4);
+      assert(!/<a[^>]*>Sitemap<\/a>/i.test(html));
     }
   }
   const manifest = await (await fetch(base + '/site.webmanifest?v=3')).json();
-  const css = await (await fetch(base + '/styles.css?v=20261005-3')).text();
+  const css = await (await fetch(base + '/styles.css?v=client-20261005-2')).text();
   assert.match(css, /--paper: #fafaf8/);
   assert.match(css, /--oak: #d6bc99/);
   assert.match(css, /--ink: #303331/);
