@@ -7,7 +7,7 @@ const base = process.env.QA_URL || 'http://127.0.0.1:18081';
 if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(base)) throw new Error('Local read-only QA only.');
 
 async function main() {
-  for (const [route, status] of [['/',200],['/tjenester',200],['/tjenester/garderober-og-skyvedorer',200],['/admin/login.php',200],['/omtale.php',200],['/404.php',404]]) {
+  for (const [route, status] of [['/',200],['/tjenester',200],['/tjenester/garderober-og-skyvedorer',200],['/adfiksittmin/login.php',200],['/omtale.php',200],['/404.php',404]]) {
     const response = await fetch(base + route);
     assert.equal(response.status, status, route);
     const html = await response.text();

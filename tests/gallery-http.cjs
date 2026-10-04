@@ -12,6 +12,7 @@ function state(mode) {
 }
 let cookie = '';
 async function request(path, fields) {
+  path = path.replace(/^\/admin(?=\/|$)/, '/adfiksittmin');
   const response = await fetch(base + path, { method: fields ? 'POST' : 'GET', redirect: 'manual', headers: cookie ? { Cookie: cookie } : {}, body: fields });
   for (const value of response.headers.getSetCookie()) if (value.startsWith('lily_session=')) cookie = value.split(';')[0];
   return { status: response.status, html: await response.text() };

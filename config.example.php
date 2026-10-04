@@ -5,6 +5,7 @@ return [
     'app_env' => getenv('APP_ENV') ?: 'production',
     'app_url' => getenv('APP_URL') ?: '',
     'pretty_urls' => true,
+    'admin_path' => getenv('ADMIN_PATH') ?: 'adfiksittmin',
     'setup_token' => getenv('SETUP_TOKEN') ?: '',
     'admin_allowed_ips' => array_values(array_filter(array_map('trim', explode(',', getenv('ADMIN_ALLOWED_IPS') ?: '')), static fn($ip) => $ip !== '')),
     'trusted_proxies' => array_values(array_filter(array_map('trim', explode(',', getenv('TRUSTED_PROXIES') ?: '')), static fn($ip) => $ip !== '')),

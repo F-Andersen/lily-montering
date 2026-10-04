@@ -27,7 +27,7 @@ function build_message(array $fields, ?int $id = null): string
     ];
     // The configured origin is trusted, never the inbound Host header.
     $origin = rtrim((string)(config()['app_url'] ?? ''), '/');
-    if ($id && $origin !== '') $lines[] = 'Administrasjon: ' . $origin . '/admin/requests/?id=' . $id;
+    if ($id && $origin !== '') $lines[] = 'Administrasjon: ' . admin_absolute_url('requests/?id=' . $id);
     return implode("\n", $lines);
 }
 

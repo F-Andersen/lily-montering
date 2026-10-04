@@ -1,3 +1,4 @@
+const messages = document.body.dataset;
 document.querySelectorAll("form[data-confirm]").forEach((form) => {
   form.addEventListener("submit", (event) => {
     if (!window.confirm(form.dataset.confirm)) event.preventDefault();
@@ -9,11 +10,11 @@ document.querySelectorAll('[data-copy-target]').forEach((button) => {
     const status = button.parentElement.querySelector('[data-copy-status]');
     try {
       await navigator.clipboard.writeText(input.value);
-      status.textContent = 'Lenken er kopiert.';
+      status.textContent = messages.copySuccess;
     } catch {
       input.focus();
       input.select();
-      status.textContent = 'Kunne ikke kopiere lenken.';
+      status.textContent = messages.copyError;
     }
   });
 });
@@ -22,7 +23,7 @@ document.querySelectorAll('[data-public-image]').forEach(input => {
   const status = input.parentElement.querySelector('[data-upload-status]');
   input.addEventListener('change', () => {
     const file = input.files[0];
-    const error = file && (file.size === 0 || file.size > 5 * 1024 * 1024) ? 'Bildet kan være høyst 5 MB og må inneholde et bilde.' : file && !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) && !(file.type === '' && /\.(jpe?g|png|webp)$/i.test(file.name)) ? 'Velg JPEG-, PNG- eller WebP-bilder.' : '';
+    const error = file && (file.size === 0 || file.size > 5 * 1024 * 1024) ? messages.uploadMax : file && !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) && !(file.type === '' && /\.(jpe?g|png|webp)$/i.test(file.name)) ? messages.uploadType : '';
     input.setCustomValidity(error);
     status.textContent = error || (file ? `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)` : '');
     if (error) input.reportValidity();
@@ -43,7 +44,7 @@ for (const name of ["seo_title", "seo_description", "home_seo_title", "home_seo_
   output.id = input.id + "-count";
   input.setAttribute("aria-describedby", output.id);
   input.after(output);
-  const update = () => { output.textContent = `${Array.from(input.value).length} / ${input.maxLength} tegn`; };
+  const update = () => { output.textContent = `${Array.from(input.value).length} / ${input.maxLength} ${messages.charLabel}`; };
   input.addEventListener("input", update);
   update();
 }

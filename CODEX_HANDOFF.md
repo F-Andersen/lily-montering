@@ -1356,3 +1356,115 @@ provider account, DNS records or credentials activated this turn. MAIL_DELIVERY
 has exact next steps/data flow. Need approval + completed credentials to change
 protected production env and test one real admin notification; verify inbox/spam
 with recipient. SMTP acceptance is not inbox proof; no automatic retry cron.
+
+## 35. Gmail SMTP Activated (2026-10-04, 22:54 Kyiv)
+
+Supersedes section34's blocked-SMTP status. User supplied an app password in
+private gmail.smtp.env for sossossossossossossossossos0@gmail.com, labeled
+fiksitt_APP in Google. Checked only presence/format/matching address, never
+printed credential. Local file owner/SYSTEM ACL retained; no key in Git/chat.
+Sender and SMTP login both this Gmail; recipient remains masxpros@gmail.com.
+
+Ignored .qa/activate-production-mail.cjs verifies owner-approved addresses,
+16-letter app password, authenticated SSH, TLS and SMTP auth before committing
+credentials to production .env. SSH stdin only, no secrets in CLI args. Backed
+up .env at /opt/lily-montering/backups/mail-20261004T195447Z, chmod0600, recreated
+only lily web; database, source image, admin password, DNS and Tezamed unchanged.
+Gmail smtp.gmail.com:587 STARTTLS authenticated true. Read-only live config
+afterward: password present true, mail_configuration_error empty.
+
+One valid HTTPS form test accepted by Gmail, contact_request#5 email_sent1.
+Subject Ny forespørsel #5 fra fiksitt, name TEST SMTP FIKSITT c02f0894c949f5ea;
+explicit synthetic description, dummy phone, no customer email/private photos.
+Two preceding all-zero placeholder-phone submissions failed422/no DB/no send.
+Repeat deliver_request returned true for already-sent row without SMTP resend.
+SSH transient timeout delayed cleanup; .qa/finish-mail-test.php deleted ONLY
+id5 after checking exact synthetic tag. Original rows/files fingerprint check
+against /opt/lily-montering/backups/mail-audit-20261004/state-before.json PASS.
+DB remains admin1/enquiries2/photos0/gallery15/reviews0/invitations0.
+Report .qa/gmail-production-result.json: smtpAccepted true, duplicateGuard true,
+testRecordCleaned true, originalDataVerified true, inboxConfirmed false.
+
+Do not resend this test or bulk resend pre-existing requests. Need owner inbox/
+spam confirmation at masxpros@gmail.com; cannot infer delivery from SMTP250.
+Brevo template remains an OPTIONAL future alternative, not the active transport.
+Ordinary Google login password is not used. For a domain From sender, verify a
+domain-capable provider first; no DNS change needed for the active @gmail sender.
+Documentation updated locally; no application code/image or Git commit/push
+required for the private credential update. Never stage private env files.
+
+## 36. Admin Languages And Private Route (2026-10-04)
+
+This section supersedes earlier tunnel-only `/admin` descriptions. Owner chose
+password-only login with attempt limits, explicitly NO email OTP/MFA.
+The release is live at fiksitt.online; production `ADMIN_PATH` is private.
+Find the address in server `.env` or the owner-only access JSON under
+`C:/Users/Anderson/.codex/private/lily-admin/`. Do not commit the actual slug.
+The private JSON URL and Start-LilyAdmin.ps1 were updated without password changes.
+Local owner preview uses http://127.0.0.1:18081/kontor/ and remains running.
+
+`url('admin/...')` rewrites to ADMIN_PATH. `admin_absolute_url()` supplies email
+notification links from APP_URL (not Host). Apache `.htaccess` dispatches unknown
+non-file routes to `admin-router.php`, a strict whitelist. Direct legacy PHP
+admin routes reject non-matching REQUEST_URI; unknown/direct-router paths 404.
+Production forbids ADMIN_PATH=admin. Preserve protected private app/tools rules.
+
+`app/admin-i18n.php`, `app/locales/admin-uk.php`, `admin/language.php` provide
+nb/uk UI-only translation. Language change is POST+CSRF, locale allowlisted,
+return route validated, locale preserved through login/logout. Business/database
+content is never automatically translated. CSP uses external admin JS and escaped
+body data attributes for translated client messages, no eval or inline script.
+Admin CSSv9/JSv6. Mobile controls fit without document overflow.
+
+Login PHP limits: 8/account and 20/client-IP per 900 seconds, trusted client_ip().
+429 includes Retry-After900. Existing atomic file-backed rate limiter remains;
+its buckets are container-local and reset if the web container is recreated.
+NGINX rate/connection limiting persists independently in shared memory.
+Only /opt/tezamed/app/nginx/ssl/fiksitt-vhost.conf was changed; parent Tezamed
+nginx.conf fingerprint unchanged. Legacy /admin now404. Custom-prefix limits:
+5requests/s/IP burst30, 10 concurrent/IP; login1/s/IP burst5 plus5/s total burst10.
+Login body max16KB, other admin body max6MiB (individual image limit stays5MiB).
+Forwarded IP/scheme headers overwritten. Private backend bindings, trusted NAT
+gateway and existing ADMIN_ALLOWED_IPS preserved. This is not CDN-level DDoS
+protection; do not claim a hidden path makes distributed floods impossible.
+
+No DB migration/seed or SMTP change. All original table rows/private and public
+uploads fingerprints preserved. SMTP config SHA unchanged, active Gmail retained.
+Backups: /opt/lily-montering/backups/admin-languages-20261004T203440Z and final
+/opt/lily-montering/backups/admin-languages-20261004T203839Z; source/env/compose,
+DB dump, private photos, old Docker image and original Fiksitt Nginx config.
+Ignored .qa/deploy-admin-languages.sh performs backup, config validation, web-only
+rebuild, ingress reload, smoke/audit verification and rollback on error.
+
+Verification: PHP lint; reviews7/workflow9/gallery5/proxy8 checks;
+review-workflow HTTP5/gallery HTTP5/design HTTP checks;
+admin-i18n HTTP7 groups (fresh isolated QA web for deterministic limits).
+Production smoke: login, Secure/HttpOnly/SameSite cookie, 18 authenticated views
+across nb/uk, logout, old-route404, actual Nginx429. No business data writes or
+mail sent by admin production smoke. Reports in ignored .qa/. CUA confirmed
+Ukrainian owner account/services/editor and production Ukrainian login.
+Source changes remain local/uncommitted; this request authorized server fixes,
+not a new Git push. Keep all credentials and actual admin slug out of Git.
+
+## 37. Owner-Selected Readable Admin Path (2026-10-04)
+
+Owner clarified they want /adfiksittmin/, not the previous random kontor suffix.
+Applied to production ADMIN_PATH + Fiksitt Nginx prefix, without rebuilding code,
+changing credentials, database rows, uploads, mail or authentication limits.
+Old /admin and the previous random admin path return404, no redirects disclosing
+the current path. Local config/example/Compose defaults and focused HTTP tests
+now use adfiksittmin. It is a custom route, NOT a secret/authentication boundary.
+This supersedes section36's kontor defaults/private-slug confidentiality language.
+Private access JSON URLs were updated; passwords and permissions remain unchanged.
+The SSH helper derives its route from that JSON, so no hardcoded old address.
+
+Backup /opt/lily-montering/backups/admin-route-20261004T204321Z contains original
+env/compose/Nginx, DB dump and private photos. Full row/file fingerprints unchanged;
+all env except ADMIN_PATH unchanged; parent Tezamed Nginx SHA unchanged.
+Ignored .qa/change-admin-route.sh validates, backs up, changes/recreates only web,
+checks Nginx config, reloads ingress and rolls back on errors.
+Verification: admin-i18n HTTP7 groups, design HTTP; production smoke passes login,
+18 authenticated views nb/uk, cookie flags, logout, old404 and actual Nginx429.
+CUA confirmed both server/local custom login URLs. Existing browser sessions expire
+on web recreation; sign in with existing passwords. QA stack stopped, volumes kept.
+No Git commit/push requested in this clarification.

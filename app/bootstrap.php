@@ -97,7 +97,22 @@ function app_path(): string
 
 function url(string $path = ''): string
 {
+    $path = ltrim($path, '/');
+    if ($path === 'admin' || str_starts_with($path, 'admin/')) $path = admin_path() . substr($path, 5);
     return app_path() . '/' . ltrim($path, '/');
+}
+
+function admin_path(): string
+{
+    $path = (string)(config()['admin_path'] ?? 'adfiksittmin');
+    if (!preg_match('/^[a-z][a-z0-9-]{4,63}$/D', $path) || in_array($path, ['assets','app','tools','database','tests','tjenester'], true)) throw new RuntimeException('Invalid administration path');
+    if ($path === 'admin' && config()['app_env'] !== 'local') throw new RuntimeException('Production administration requires a custom path');
+    return $path;
+}
+
+function admin_absolute_url(string $path = ''): string
+{
+    return rtrim(config()['app_url'], '/') . '/' . admin_path() . '/' . ltrim($path, '/');
 }
 
 function redirect(string $path): never

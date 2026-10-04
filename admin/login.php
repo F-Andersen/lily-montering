@@ -8,10 +8,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     require_post_csrf();
     $email = strtolower(trim(is_string($_POST['email'] ?? null) ? $_POST['email'] : ''));
     $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
-    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    $ip = client_ip();
     if (!rate_limit('login-ip', $ip, 20, 900) || !rate_limit('login-account', $email, 8, 900)) {
         http_response_code(429);
-        $error = 'For mange forsøk. Prøv igjen om 15 minutter.';
+        header('Retry-After: 900');
+        $error = admin_t('For mange forsøk. Prøv igjen om 15 minutter.');
     } else {
         try {
             $admin = query('SELECT * FROM admins WHERE email = ? AND active = 1', [$email])->fetch();
@@ -25,18 +26,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     $admin['password_hash'] = password_hash($password, PASSWORD_DEFAULT);
                     query('UPDATE admins SET password_hash = ? WHERE id = ?', [$admin['password_hash'], $admin['id']]);
                 }
-                $_SESSION = ['admin_id' => $admin['id'], 'last_activity' => time(), 'csrf' => bin2hex(random_bytes(32)), 'auth_version' => hash('sha256', $admin['password_hash'])];
+                $_SESSION = ['admin_id' => $admin['id'], 'last_activity' => time(), 'csrf' => bin2hex(random_bytes(32)), 'auth_version' => hash('sha256', $admin['password_hash']), 'admin_locale' => admin_locale()];
                 redirect('admin/');
             }
-            $error = 'Feil e-postadresse eller passord.';
-        } catch (Throwable $ex) { safe_log('login unavailable', $ex); http_response_code(503); $error = 'Innlogging er midlertidig utilgjengelig.'; }
+            $error = admin_t('Feil e-postadresse eller passord.');
+        } catch (Throwable $ex) { safe_log('login unavailable', $ex); http_response_code(503); $error = admin_t('Innlogging er midlertidig utilgjengelig.'); }
     }
 }
-admin_header('Logg inn', false);
+admin_header(admin_t('Logg inn'), false);
 if ($error) admin_error($error);
 ?>
 <form class="edit-form" method="post"><?= csrf_input() ?>
-<label class="field" for="email"><span>E-post</span><input id="email" name="email" type="email" maxlength="190" autocomplete="username" required></label>
-<label class="field" for="password"><span>Passord</span><input id="password" name="password" type="password" maxlength="200" autocomplete="current-password" required></label>
-<button type="submit">Logg inn</button><a href="<?= e(url()) ?>">Til nettsiden</a></form>
+<label class="field" for="email"><span><?= e(admin_t('E-post')) ?></span><input id="email" name="email" type="email" maxlength="190" autocomplete="username" required></label>
+<label class="field" for="password"><span><?= e(admin_t('Passord')) ?></span><input id="password" name="password" type="password" maxlength="200" autocomplete="current-password" required></label>
+<button type="submit"><?= e(admin_t('Logg inn')) ?></button><a href="<?= e(url()) ?>"><?= e(admin_t('Til nettsiden')) ?></a></form>
 <?php admin_footer(); ?>

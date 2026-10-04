@@ -12,8 +12,8 @@
 | --- | --- | --- |
 | Сайт і форма | Приймають запит клієнта | Працюють на VPS |
 | База та адмінпанель | Зберігають заявку і дозволяють її обробити | Працюють |
-| SMTP-відправник | Передає сповіщення поштовому провайдеру | Код готовий, авторизація ще не працює |
-| Скринька адміністратора | Отримує сповіщення | Запланована masxpros@gmail.com |
+| SMTP-відправник | Передає сповіщення поштовому провайдеру | Gmail авторизація та прийняття тестового листа перевірені |
+| Скринька адміністратора | Отримує сповіщення | masxpros@gmail.com; очікується підтвердження inbox від власника |
 
 Домен є адресою, а не сервером і не поштовою скринькою. Купівля домену
 сама по собі не створює SMTP, HTTPS чи пошту на домені. Провайдер може
@@ -50,7 +50,8 @@ SMTP з'єднання із поштовим провайдером через T
 помилку, щоб клієнт міг повторити спробу.
 
 Зараз немає автоматичного листа-підтвердження клієнту: адреса клієнта
-необов'язкова і використовується тільки для Reply-To. Фото форма не приймає.
+необов'язкова і використовується тільки для Reply-To. Форма приймає до 5 фото
+по 5 МБ; вони зберігаються приватно і не прикріплюються до email.
 Також немає автоматичної фонової черги: невідправлені заявки потрібно
 переглядати в адмінці та надсилати вручну після відновлення SMTP.
 
@@ -294,6 +295,10 @@ fiksitt-seo-qa (18082 / Mailpit 18026), перевіряє точний local en
 
 ## Production SMTP: 2026-10-04
 
+Historical daytime audit below is superseded by the Gmail activation section
+at the end of this document. Brevo is an optional future provider, not required
+for the current Gmail sender.
+
 Read-only audit confirmed `smtp.gmail.com:587`, TLS, configured SMTP username,
 but **no SMTP password**. Recipient is `masxpros@gmail.com`. Real notification
 delivery is not enabled. Local Mailpit tests do not deliver to Gmail.
@@ -335,3 +340,34 @@ jobs with a customer email address.
 Provider documentation:
 - https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP
 - https://help.brevo.com/hc/en-us/articles/7959631848850-Create-and-manage-your-SMTP-keys
+
+## Gmail Activated: 2026-10-04, 22:54 Kyiv
+
+The owner created a Google app password named `fiksitt_APP` and saved the
+credential in the restricted private local `gmail.smtp.env`. The app label
+is not the password. Neither app password nor ordinary Google password was
+printed, put in shell arguments or committed. SMTP authentication was tested
+over SSH stdin; only after TLS and Gmail authentication succeeded was the
+production protected environment updated and the Fiksitt web service recreated.
+
+- Sender / SMTP login: `sossossossossossossossossos0@gmail.com`.
+- Recipient: `masxpros@gmail.com`.
+- Server: `smtp.gmail.com:587`, explicit STARTTLS with certificate verification.
+- Environment backup: `/opt/lily-montering/backups/mail-20261004T195447Z`.
+- Exactly one notification was accepted by Gmail through the real HTTPS form:
+  subject `Ny forespørsel #5 fra fiksitt`, marked `TEST SMTP FIKSITT`, no real
+  customer details or photos. Two prior invalid placeholder-phone submissions
+  were rejected before storage/send. `email_sent=1` confirmed acceptance.
+- Calling deliver_request again for the accepted test returned without sending
+  a duplicate. Only its own synthetic request was removed. Existing admin1,
+  enquiries2, gallery15, services6/categories6/settings9 and private/upload file
+  checksums remained unchanged. SSH briefly timed out during cleanup; cleanup
+  and full state verification then completed without resending the email.
+- Local result: `.qa/gmail-production-result.json` (ignored, no credentials).
+
+**Inbox delivery is not yet confirmed by the recipient.** Check Inbox and Spam
+on masxpros@gmail.com for the test subject. Do not automatically resend this
+accepted test or all older enquiries. Gmail remains dependent on this account,
+app-password validity and provider limits. DNS and Tezamed were not modified.
+For a future From address on fiksitt.online, use a verified domain-capable mail
+provider; do not simply replace the Gmail From address with an unverified one.

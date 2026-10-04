@@ -1,5 +1,39 @@
 # fiksitt
 
+## Current Admin Access (2026-10-04)
+
+Administration now uses a configurable `ADMIN_PATH`, not the public `/admin` URL.
+Local owner preview: http://127.0.0.1:18081/adfiksittmin/.
+Production uses the server `ADMIN_PATH`, also recorded in the owner's private
+access file outside Git. On 2026-10-04 the owner requested the readable custom
+path `adfiksittmin`; it is not an authentication secret. Do not add administration
+links to public navigation, robots.txt or sitemap. The old `/admin` returns 404.
+
+The language selector supports Ukrainian and Norwegian Bokmal, including login,
+navigation, forms, statuses, confirmations and validation. It persists in the
+session through login/logout. Customer messages, reviews, service names and SEO
+content are not translated or modified. Add UI messages in `app/locales/admin-uk.php`.
+
+Password-only authentication remains active, with 8 attempts per account and
+20 attempts per client IP per 15 minutes. Only a configured trusted proxy can
+supply the client IP. Production Nginx additionally limits login requests to
+1/s/IP (burst 5) and 5/s total (burst 10), other admin requests to 5/s/IP (burst 30),
+and concurrent admin requests to 10/IP; exceeded limits return 429. These controls
+do not replace provider/CDN-level protection against distributed traffic floods.
+
+Gmail SMTP is active with STARTTLS and an app password held outside Git.
+Mail acceptance was tested; receipt in the owner's inbox still needs confirmation.
+Existing passwords, data and mail configuration were preserved during this release.
+The production backend remains private and the Tezamed configuration is unchanged.
+
+Run `node tests/admin-i18n-http.cjs` in the isolated reviews QA stack (18084,
+default `ADMIN_PATH=adfiksittmin`) for routes, two languages, CSRF, content isolation,
+logout and password-attempt limits. Restart only that QA web container before
+rerunning rate-limit tests; never clear production throttles to run a test.
+
+The following sections also contain historical release notes. Their old `/admin`
+URLs and tunnel-only access descriptions are superseded by this section.
+
 The owner selected fiksitt and the intended domain `fiksitt.online` on 2026-10-04.
 DNS and HTTPS were activated on the VPS on 2026-10-04 at https://fiksitt.online/.
 HTTP and www redirect to this canonical hostname, not Tezamed. Indexing remains
@@ -516,4 +550,4 @@ or an SEO rating. It disappears when genuine approved reviews are available.
 Supplied artwork says fiksit; configured company/domain remains fiksitt pending
 confirmation. See CODEX_HANDOFF section34, QA_REPORT and MAIL_DELIVERY.
 
-Public phone, public email, organization number and social links remain blank until provided. Østlandet should be confirmed. Prices and durations are optional. The VPS uses https://fiksitt.online with HTTPS; public_domain and SEO indexing remain intentionally disabled in settings. Real SMTP activation and inbox verification are still required. This repository does not deploy itself to hosting.
+Public phone, public email, organization number and social links remain blank until provided. Østlandet should be confirmed. Prices and durations are optional. The VPS uses https://fiksitt.online with HTTPS; public_domain and SEO indexing remain intentionally disabled in settings. Gmail SMTP was activated on 2026-10-04 with the owner-provided app password; a real form notification was accepted, but recipient inbox confirmation is still required. Historical unactivated-SMTP notes above are superseded by MAIL_DELIVERY.md's Gmail activation section. This repository does not deploy itself to hosting.

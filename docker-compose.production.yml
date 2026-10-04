@@ -11,6 +11,7 @@ services:
       - "${INGRESS_BIND_IP:-127.0.0.1}:${INGRESS_PORT:-18080}:80"
     environment:
       APP_ENV: production
+      ADMIN_PATH: ${ADMIN_PATH:?ADMIN_PATH is required}
       APP_URL: ${APP_URL:?APP_URL is required}
       DB_HOST: db
       DB_PORT: 3306

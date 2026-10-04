@@ -14,6 +14,9 @@ DirectoryIndex index.php index.html
   RewriteRule ^tjenester/([a-z0-9-]+)/?$ tjenester.php?slug=$1 [QSA,L]
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
   RewriteRule ^robots\.txt$ robots.php [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ admin-router.php [END]
 </IfModule>
 
 <FilesMatch "^(config|config\.example)\.php$">
