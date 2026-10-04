@@ -461,3 +461,45 @@ admin workflows and full business regression not rerun for this styling-only
 change. No server deployment, Git push, account changes or SMTP activation.
 Uploaded artwork spelling fiksit retained pending owner confirmation; configured
 company/domain remains fiksitt. Prompt/asset provenance: CODEX_HANDOFF section33.
+
+## Pastel Release And Production Verification (2026-10-04)
+
+Source release 8eef547 pushed to origin/main and deployed to Fiksitt VPS.
+Public CSSv16/admin CSSv8; coral buttons, pale blue status/section surfaces,
+pastel yellow header, no green theme tokens. Explicitly labeled demo review:
+Ole Hansen (fictional), actual work photo from the user's folder, no rating,
+verification badge, fabricated database record or structured-data review.
+It is shown only in the available-storage empty state and hidden for real reviews.
+
+Rerun isolated QA: reviews.php 7 groups, review-workflow.php 9 groups,
+review-workflow-http.cjs 5 groups, gallery.php 5 groups, gallery-http.cjs 5 groups.
+All PASS. Covers idempotent migrations, token/session/CSRF/consent/moderation,
+WebP families/metadata/orientation, exactly-5-MiB allowed/over-limit rejected,
+failed-DB cleanup and reference-safe deletion. Fixtures cleaned; isolated QA
+containers stopped with volumes retained. Owner preview/account untouched.
+PHP syntax checked for root/app/admin/tools. Read-only design-http.cjs PASS.
+
+Production read-only verification PASS: 12 routes, 21 public WebP assets,
+new PNG icon dimensions, CSS palette/version, HTTPS/WWW redirects to Fiksitt,
+protected admin/source paths, noindex/no-referrer/no-store review page,
+dynamic CSP hashes and no unsafe-eval. Tezamed HTTPS remains 200 at tezamed.com.
+No production enquiries, review invitations or outbound emails created.
+CUA: desktop demo/photo visible; 320px no body overflow/non-sticky mobile
+header; menu, gallery next 1->2, Escape focus return; 390px actual full photo
+loaded1125px and object-fit:contain. Viewport reset. Real Safari unavailable.
+Evidence: .qa/production-release-check.json, .qa/pastel-production-desktop.png.
+
+Backups: /opt/lily-montering/backups/pastel-gallery-20261004T135929Z (original
+pre-release DB/source/private photos) and pastel-gallery-20261004T140107Z
+(successful retry). First attempt rolled back application image because archive
+line-ending normalization changed assets/uploads/.htaccess checksum. Retry
+excluded the entire uploads directory. All original DB row fingerprints and
+private/upload file checksums verified against BOTH snapshots. Original admin1,
+requests2, services6/categories6/settings9 unchanged; gallery9->15 through six
+idempotent real-photo additions; reviews0/invitations0. .env and production
+compose checksums unchanged; no DNS, Tezamed or account changes.
+
+SMTP remains blocked: smtp.gmail.com:587/TLS, username present, password absent.
+Recipient masxpros@gmail.com. Mailpit PASS proves logic, not Gmail inbox delivery.
+Private Brevo template created outside Git with owner/SYSTEM-only ACL; requires
+owner-created SMTP login/key and verified domain/sender, then a delivery test.

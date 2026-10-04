@@ -1289,3 +1289,70 @@ retested this turn; their markup/layout are unchanged except branding/styles.
 Real Safari/iPhone unavailable. Existing stage3/4 business tests not rerun in
 this styling-only turn. Results .qa/design-responsive.json; screenshots
 .qa/design-home-desktop.png and .qa/design-home-mobile.png. No SMTP test performed.
+
+## 34. Pastel Release Published (2026-10-04)
+
+Latest user request: remove remaining greens/use pastel palette; add one Norwegian
+review with folder photo; push to server and Git; list remaining email setup.
+Source commit 8eef547 pushed to origin/main, deployed to /opt/lily-montering/app.
+Public styles.css?v=16; admin/admin.css?v=8. Tokens renamed from pine/wood/green
+to brand-blue/brand-red. Surfaces yellow #fff2bd, blue #e7eff8, coral #f6cccf;
+text #263849/#31527b. Status-success colors also blue, not green. Versioned
+wordmark/icons unchanged from section33. Supplied logo artwork spelling fiksit
+still differs from company/domain fiksitt; awaiting owner decision, not altered.
+
+app/reviews.php empty-state demo is explicitly labeled as not a real customer
+review: Ole Hansen (fiktivt navn), Norwegian sample text, image
+assets/images/hvitt-garderoberom.webp from curated user-folder IMG9009. Photo is
+of work, not a portrait. No DB insert, verified badge, stars, publication date,
+aggregateRating or review schema. Only shown if storage available and no genuine
+public approved reviews; tests cover unavailable/empty/real-review states.
+
+Full previously local stages3+4 now published: review invitation/redemption/
+moderation and 15-photo native gallery/full-image dialog, WebP320/900/full,
+5-MiB inclusive upload checks. Production migrations reviews.sql and
+review_workflow.sql applied idempotently. seed.sql NEVER run. CLI gallery import
+added six real entries once; repeat added0. Legacy conversion found0 managed
+JPEG/PNG public uploads; DB paths/originals preserved. No customer-data fixtures.
+
+Deployment details and rollback:
+- .qa/deploy-pastel-gallery.sh (ignored), .qa/release-audit.php (CLI/private).
+- git archive release sent over authenticated SSH using existing key. Git archive
+  uses Windows CRLF conversion; deployed CSS matches git content after EOL
+  normalization. Never include config.php/.env, raw foto, QA credentials.
+- Exclude production/local compose and ALL assets/uploads from extraction.
+- Backup original: /opt/lily-montering/backups/pastel-gallery-20261004T135929Z.
+  source.tgz, database.sql, private-photos.tgz, web-image.txt, row/file hashes.
+- First deploy rolled back old image after assets/uploads/.htaccess EOL mismatch.
+  Additive schema and six gallery additions retained. No DB restore/drop.
+- Successful retry backup: /opt/lily-montering/backups/pastel-gallery-20261004T140107Z.
+- Original rows/files verified against both snapshots after success. Admin1,
+  enquiries2, photos0, services6, categories6, settings9 unchanged; gallery15,
+  reviews0 and review_invitations0. .env/production compose byte-identical.
+- Existing nginx, DNS, Tezamed, SSH/account/passwords unchanged. Admin403 remains
+  intentional outside SSH/private tunnel. Never open admin to public for tests.
+- Source rollback uses saved image tagged lily-web:before-pastel-<backup-name>
+  and existing compose web recreation. Do not blindly restore DB after new user
+  submissions; additive migrations can remain with old application image.
+
+QA: reviews7, workflow9, workflow HTTP5, gallery5, gallery HTTP5 groups PASS;
+PHP syntax root/app/admin/tools and read-only design-http PASS. Isolated
+fiksitt-reviews-qa stopped, volumes retained and fixture cleanup completed.
+Production .qa/production-release-check.cjs PASS:12 routes,21 WebP assets, new
+icons, canonical HTTPS/WWW redirects, private headers/protected routes/CSP,
+Tezamed200 unaffected. No production form submissions or emails. CUA confirms
+desktop demo/photo,320 nooverflow/menu/slider next/Escape-focus,390 actual full
+photo loaded with contain. Real Safari not available. Viewport reset.
+
+Mail remains NOT active: production audit shows smtp.gmail.com:587/TLS with
+username present but SMTP_PASSWORD empty. Recipient masxpros@gmail.com. No
+passwords read into output or changed. Previous ordinary Gmail AUTH failed;
+do not repeat without new supported credentials. Suggested service Brevo:
+owner signs up/accepts terms, enables transactional mail, verifies fiksitt.online
+and notifications@ sender using exact provider DNS, generates SMTP key (NOT API
+key). Private template C:/Users/Anderson/.codex/private/fiksitt-mail/brevo.smtp.env
+created with blank user/password, owner/SYSTEM ACL, outside repository. No
+provider account, DNS records or credentials activated this turn. MAIL_DELIVERY
+has exact next steps/data flow. Need approval + completed credentials to change
+protected production env and test one real admin notification; verify inbox/spam
+with recipient. SMTP acceptance is not inbox proof; no automatic retry cron.

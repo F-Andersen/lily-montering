@@ -505,11 +505,15 @@ and responsive slider/dialog checks. See CODEX_HANDOFF.md section32.
 
 ## Remaining business information
 
-Local brand redesign uses the supplied blue/red hammer logo with yellow/white
-bands and red CTAs. Preview: http://127.0.0.1:18081/. Public CSSv15/admin CSSv7;
-include new assets/fiksitt-*-v2* icons and wordmark plus site.webmanifest when
-deploying. No database migration is required for branding. No push/deployment
-performed. Supplied artwork says fiksit; configured company/domain remains
-fiksitt pending confirmation. See CODEX_HANDOFF section33 and QA_REPORT.
+Brand redesign is deployed at https://fiksitt.online/ (2026-10-04). The supplied
+blue/red hammer logo now uses pastel yellow, pale blue and coral surfaces;
+green status colors were removed from the public site and administration.
+Preview: http://127.0.0.1:18081/. Public CSSv16/admin CSSv8. New versioned icons,
+wordmark, manifest, review workflow and the 15-photo WebP slider are published.
+The empty review section includes an explicitly labeled demonstration with
+the fictional name Ole Hansen and a work photo, never a verified testimonial
+or an SEO rating. It disappears when genuine approved reviews are available.
+Supplied artwork says fiksit; configured company/domain remains fiksitt pending
+confirmation. See CODEX_HANDOFF section34, QA_REPORT and MAIL_DELIVERY.
 
 Public phone, public email, organization number and social links remain blank until provided. Østlandet should be confirmed. Prices and durations are optional. The VPS uses https://fiksitt.online with HTTPS; public_domain and SEO indexing remain intentionally disabled in settings. Real SMTP activation and inbox verification are still required. This repository does not deploy itself to hosting.
