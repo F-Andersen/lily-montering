@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/crud.php';
 require_once dirname(__DIR__, 2) . '/app/mail.php';
 require_once dirname(__DIR__, 2) . '/app/request-photos.php';
+require_once dirname(__DIR__, 2) . '/app/admin-reviews.php';
 require_admin();
 $statuses = ['new' => 'Ny', 'in_progress' => 'Under arbeid', 'completed' => 'Fullført', 'spam' => 'Spam'];
 $id = max(0, (int)($_GET['id'] ?? $_POST['id'] ?? 0));
@@ -11,6 +12,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     require_post_csrf();
     try {
         if (!$id || !query('SELECT id FROM contact_requests WHERE id = ?', [$id])->fetch()) throw new InvalidArgumentException('Forespørselen finnes ikke.');
+        if(in_array($_POST['action']??'', ['create_review_invitation','send_review_invitation','revoke_review_invitation'],true)) review_invitation_action($_POST['action'],$id);
         if (($_POST['action'] ?? '') === 'send_email') {
             if (!rate_limit('admin-mail', (string)$_SESSION['admin_id'], 10, 600)) throw new InvalidArgumentException('For mange sendeforsøk. Prøv igjen senere.');
             if (!deliver_request($id)) throw new RuntimeException('Mail delivery failed');
@@ -27,7 +29,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         redirect('admin/requests/');
     } catch (InvalidArgumentException $ex) { $error = $ex->getMessage(); }
-    catch (Throwable $ex) { safe_log('request update unavailable', $ex); $error = ($_POST['action'] ?? '') === 'send_email' ? 'E-post kunne ikke sendes. Forespørselen er fortsatt lagret. Kontroller SMTP i innstillingene.' : 'Kunne ikke oppdatere forespørselen.'; }
+    catch (Throwable $ex) { safe_log('request update unavailable', $ex); $error = match($_POST['action'] ?? '') {
+        'send_email' => 'E-post kunne ikke sendes. Forespørselen er fortsatt lagret. Kontroller SMTP i innstillingene.',
+        'send_review_invitation' => 'Invitasjonen kunne ikke sendes på e-post. Lenken er fortsatt gyldig. Kontroller SMTP i innstillingene.',
+        default => 'Kunne ikke oppdatere forespørselen.',
+    }; }
 }
 admin_header('Forespørsler');
 if ($error) admin_error($error);
@@ -46,6 +52,7 @@ try {
 <?php foreach ($photos as $number => $photo): $photoUrl = url('admin/requests/photo.php?id=' . $photo['id']); ?>
 <figure><a href="<?= e($photoUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Åpne bilde <?= $number + 1 ?>"><img src="<?= e($photoUrl . '&size=thumb') ?>" alt="Vedlagt bilde <?= $number + 1 ?>" width="<?= $photo['width'] ?>" height="<?= $photo['height'] ?>" loading="lazy"></a><figcaption>Bilde <?= $number + 1 ?> · <?= (int)ceil($photo['bytes'] / 1024) ?> KB <a href="<?= e($photoUrl . '&download=1') ?>">Last ned</a></figcaption></figure>
 <?php endforeach ?></div><?php endif ?>
+<?php review_invitation_panel($r); ?>
 <form class="edit-form" method="post"><?= csrf_input() ?><input type="hidden" name="id" value="<?= $id ?>">
 <label class="field" for="status"><span>Status</span><select id="status" name="status"><?php foreach ($statuses as $s => $label): ?><option value="<?= $s ?>" <?= $r['status'] === $s ? 'selected' : '' ?>><?= $label ?></option><?php endforeach ?></select></label>
 <label class="check"><input type="checkbox" name="archived" <?= $r['archived'] ? 'checked' : '' ?>>Arkivert</label><button type="submit">Lagre status</button></form>

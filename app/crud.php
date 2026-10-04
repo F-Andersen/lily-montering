@@ -126,7 +126,7 @@ function crud_page(string $kind): void
                     echo '</div>';
                 }
             } elseif (!empty($record['image'])) echo image_html($record['image'], $record['alt_text'] ?? $record['title'] ?? '', 'image-preview', true, '200px');
-            ?><label class="field" for="image_file"><span>Bilde (JPEG, PNG, WebP, maks. 5 MB)</span><input id="image_file" name="image_file" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            ?><label class="field" for="image_file"><span>Bilde (JPEG, PNG, WebP, maks. 5 MB)</span><input id="image_file" name="image_file" type="file" accept="image/jpeg,image/png,image/webp" data-public-image aria-describedby="image-file-status"><span class="field-meta" id="image-file-status" data-upload-status role="status"></span></label>
 <?php if ($kind === 'services'): ?><label class="check"><input type="checkbox" name="remove_image">Fjern bildet</label><?php endif ?>
 <?php
         }

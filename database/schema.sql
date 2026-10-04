@@ -79,3 +79,34 @@ CREATE TABLE IF NOT EXISTS request_photos (
  CONSTRAINT request_photo_request FOREIGN KEY (request_id) REFERENCES contact_requests(id) ON DELETE CASCADE,
  INDEX request_photo_order (request_id, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS reviews (
+ id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ request_id INT UNSIGNED NOT NULL UNIQUE,
+ display_name VARCHAR(80) NOT NULL,
+ rating TINYINT UNSIGNED NOT NULL,
+ body VARCHAR(1500) NOT NULL,
+ status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+ verified_at DATETIME NULL,
+ published_at DATETIME NULL,
+ moderated_by INT UNSIGNED NULL,
+ moderated_at DATETIME NULL,
+ moderation_note VARCHAR(500) NOT NULL DEFAULT '',
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ CONSTRAINT review_request FOREIGN KEY (request_id) REFERENCES contact_requests(id) ON DELETE CASCADE,
+ CONSTRAINT review_rating CHECK (rating BETWEEN 1 AND 5),
+ INDEX review_publication (status,published_at,id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS review_invitations (
+ id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ request_id INT UNSIGNED NOT NULL UNIQUE,
+ token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ expires_at DATETIME NOT NULL,
+ used_at DATETIME NULL,
+ revoked_at DATETIME NULL,
+ mail_sent_at DATETIME NULL,
+ created_by INT UNSIGNED NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT invitation_request FOREIGN KEY (request_id) REFERENCES contact_requests(id) ON DELETE CASCADE,
+ CONSTRAINT invitation_admin FOREIGN KEY (created_by) REFERENCES admins(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

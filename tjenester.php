@@ -19,7 +19,7 @@ if ($slug !== '') {
     $canonicalPath = service_canonical_path($slug);
     if (config()['pretty_urls']) public_alias_redirect($canonicalPath, ['tjenester.php', $canonicalPath . '/']);
     $serviceSchema = ['@type' => 'Service', '@id' => absolute_url($canonicalPath) . '#service', 'url' => absolute_url($canonicalPath), 'name' => $service['title'], 'serviceType' => $service['category_title'], 'description' => $service['short_description'], 'provider' => business_schema(), 'areaServed' => $s['service_region']];
-    if ($image !== '') $serviceSchema['image'] = absolute_url($image);
+    if ($image !== '') $serviceSchema['image'] = absolute_url(preferred_image_path($image));
     $schema = ['@context' => 'https://schema.org', '@graph' => [$serviceSchema, breadcrumb_schema(['' => 'Forside', service_canonical_path() => 'Tjenester', $canonicalPath => $service['title']])]];
     $meta = service_metadata($service);
     public_head($meta['title'], $meta['description'], $canonicalPath, $schema, false, $image, $imageAlt);

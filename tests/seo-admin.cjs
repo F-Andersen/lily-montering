@@ -81,8 +81,8 @@ async function main() {
       assert(breadcrumbs.itemListElement.length >= 2);
       if (path.includes("kontor-og-naering") && !path.includes("?")) {
         assert.equal(graph[0]["@type"], "Service");
-        assert(graph[0].image.endsWith("lys-trehylle-montert.jpg"));
-        assert.equal(await page.locator('meta[property="og:image"]').getAttribute("content"), base + "/assets/images/lys-trehylle-montert.jpg");
+        assert(graph[0].image.endsWith("lys-trehylle-montert.webp"));
+        assert.equal(await page.locator('meta[property="og:image"]').getAttribute("content"), base + "/assets/images/lys-trehylle-montert.webp");
       } else assert.equal(graph[0].itemListElement.length, await page.locator(".catalog-card").count());
     }
     assert(!/ratingValue|reviewCount/.test(json));
@@ -136,7 +136,7 @@ async function main() {
   assert.equal(uploaded.status(), 200);
   upload = sql("SELECT image FROM gallery_items WHERE caption=?", [prefix])[0].image;
   for (const width of [320, 900]) {
-    const response = await context.request.get("/" + upload.replace(/\.jpg$/, "-" + width + ".webp"));
+    const response = await context.request.get("/" + upload.replace(/\.(?:jpg|webp)$/, "-" + width + ".webp"));
     assert.equal(response.status(), 200);
     assert.equal((await sharp(await response.body()).metadata()).width, width);
   }

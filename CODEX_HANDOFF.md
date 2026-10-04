@@ -1012,3 +1012,280 @@ guarded CLI pass. Live email_sent=[0,0]: real SMTP is STILL NOT ACTIVATED; local
 Mailpit notification tests passed, but no Gmail inbox delivery claimed.
 Evidence: .qa/request-photos/results.json, production-final.json, live-form.jpg,
 admin-mobile-photo.jpg. Local credentials only in ignored UI fixture JSON.
+
+## 30. Git Release And Public Reviews Section, 2026-10-04
+
+User asked to push the new version and proceed to the next plan stage. Existing
+release (PHP/admin/SEO/branding/mail/private enquiry photos) committed and pushed
+to main: 2e0f29226561345c21f549914c4fec1f43fd0dc0, remote
+https://github.com/F-Andersen/lily-montering.git. ls-remote confirmed exact hash.
+Private config, .env, .qa, raw foto and customer uploads excluded. No automatic
+hosting deployment. Git identity was preserved. This supersedes historical
+"no Git push" notes above, which describe earlier work only.
+
+Stage2 is LOCAL ONLY and not yet committed/pushed: app/reviews.php reader/view,
+index.php integration after gallery, #omtaler in header/footer, responsive CSS,
+official Lucide star icon (existing license), stylesheet cache keyv7. No new JS.
+reviews table in fresh schema and additive migration20261004_reviews.sql.
+One row per contact request, public display_name separate from private name,
+rating1-5 CHECK, default pending, nullable verified_at/published_at, FK cascade.
+Reader requires approved + verified_at + published_at<=UTC_TIMESTAMP + completed
+enquiry, newest6. Selects only public name/rating/body/date/service. Escaped text,
+native details for >320characters with240character excerpt, accessible ratings.
+Truthful empty state, separate unavailable state on DB errors. No fake reviews,
+aggregate rating schema, public photo links or customer contact information.
+
+Stage3 NOT implemented: invitation tokens, verified customer submission,
+moderation and admin reviews screens. A verified timestamp is a future trusted
+server-workflow result, not evidence that this workflow already exists. Stage4
+slider/bulk WebP conversion also pending. SMTP is still unactivated as in29.
+
+Owner preview fiksitt-brand-preview18081/fiksitt_preview: DB backup in ignored
+.qa/reviews-preview-before.sql; guarded additive migration with all existing
+table row hashes unchanged, empty reviews table. Do NOT seed synthetic reviews
+there. Source bind mounts show new code immediately; owner account preserved.
+VPS/Tezamed/DNS/admin access/env untouched this turn. Future production deploy
+needs explicit approval, backup and ONLY the new migration, never seed import.
+
+QA: isolated fiksitt-reviews-qa18084/18028/fiksitt_reviews_qa. tests/reviews.php
+7groups PASS: idempotent migration, truthful empty state, visibility filters/order/
+privacy, XSS escaping/accessible stars/long text, constraints/uniqueness, missing
+table fallback, enquiry-delete cascade. Own UI fixtures removed and final suite
+rerun without retention. All PHP syntax PASS. CUA Chromium responsive320/390/768/
+844/1024/1440: no overflow, cards contained, icons loaded, native disclosure opens
+and closes incl mobile, mobile menu anchor closes menu, heading not under header.
+Owner empty state checked320/390/1024, CTA goes to#kontakt, no console warnings/
+errors. This is not real iOS Safari/WebKit testing. Viewport reset, agent tabs
+closed, isolated QA services stopped; owner's18081 preview left running.
+Evidence: .qa/reviews-results.json, reviews-responsive.json,
+reviews-empty-responsive.json, reviews-desktop.jpg, reviews-mobile.jpg,
+reviews-preview.jpg. The populated screenshots show clearly labelled synthetic
+TEST ONLY fixtures, not actual customer testimonials.
+
+## 31. Stage2 Production Deployment And Stage3 Local Workflow, 2026-10-04
+
+Owner approved stage2 server publication and asked to continue next stage.
+Stage2 deployed to188.137.232.136, /opt/lily-montering/app using production
+compose. Backup /opt/lily-montering/backups/reviews-stage2-20261004T095713Z
+contains source/config/uploads, DB dump, private-photo archive, old imageID,
+build log and pre/post row hashes. Old image tag lily-web:before-reviews-stage2.
+An earlier attempt stopped before code/migration changes because the snapshot
+helper used incorrect table names; corrected to actual schema, then reran with
+a NEW complete backup. Do not use the incomplete earlier backup for rollback.
+Only stage2 public files, schema and additive reviews migration uploaded;
+rebuilt/recreated web only. All original table hashes and env/compose hashes
+unchanged. No nginx, DNS, SMTP, admin/password, Tezamed or customer data edits.
+Production CSSv7/scriptv6. HTTPS fiksitt+Tezamed200 TLSverify0; public admin403;
+undeployed omtale.php404. Browser confirms live empty #omtaler and mobile390
+no overflow/header relative. Evidence .qa/reviews-live.jpg. No Git commit/push
+this turn: GitHub main still2e0f292; stage2+stage3 code/docs are local changes.
+
+Stage3 implemented LOCAL ONLY: app/review-workflow.php, app/admin-reviews.php,
+admin/reviews/index.php, omtale.php, review.js, invitation panel in admin request
+detail, pending-review dashboard metric, admin navigation, Lucide copy icon.
+Public CSSv10/scriptv6/reviewJSv3; adminCSSv6/adminJSv4. Enquiry photos unchanged.
+SQL20261004_review_workflow.sql creates review_invitations and adds latest
+moderator ID/time/note to reviews. MariaDB10.11-specific idempotent ALTER syntax;
+adapt explicitly before another DB engine. Fresh schema includes all fields.
+
+Admin auth+CSRF required for create/send/revoke/moderate. Invitations require
+completed non-archived enquiry without an existing review;256-bit random token,
+SHA256 only in DB,30-day lifetime, one row/request. Reissue rotates old token;
+revocation, job status and expiry checked at redemption AND transactional
+submission. Raw token only in private admin session with30-minute UI TTL for
+manual copying/explicit customer email; not recoverable from hash. Email uses
+trusted APP_URL origin and original customer's email, never inbound Host/data.
+SMTP acceptance flag/idempotence for normal retries; cannot prove inbox receipt
+or exactly-once delivery across a DB failure after SMTP acceptance. Production
+SMTP STILL NOT ACTIVATED. Mailpit tests do not mean Gmail delivery works.
+
+Personal link is /omtale.php#token=...; external JS removes fragment/history,
+CSRF POST exchanges for a30-minute session grant. Hidden redemption form also
+exists in thank-you/previous-form states; hashchange handles same-document new
+invitations. Invalid token clears old grant rather than submitting old enquiry.
+Native manual code/full-link redemption and review POST work without JS.
+No token in GET access logs, no request-body logging should be enabled.
+No-store/noindex/nofollow/no-referrer headers. Apache generic Referrer-Policy
+overrode PHP initially; scoped .htaccess override fixed and HTTP verified.
+No third-party assets, private enquiry fields or photo data on customer page.
+Body32KiB supports maximum UTF-8 review text encoded as form data; no files.
+IP30/hour and invitation10/hour submissions; admin actions30/hour. Consent,
+scalar/UTF-8/length/rating validation. Verified means association via privately
+delivered completed-enquiry invitation, not cryptographic identity proof.
+
+Submission locks enquiry then invitation using CURRENT locking reads, inserts
+pending review + consumes token in one transaction; concurrent replay cannot
+publish/duplicate. Pending/rejected never public. Admin may approve/unpublish/
+reject, search/filter/page/link enquiry; cannot alter original body/rating.
+Latest moderator/time/private note saved; not a full audit history. Approve
+requires verified and completed; all rating levels use same workflow. Public
+reader retains stage2 filtering and selects no internal metadata. Delete enquiry
+cascades invitations/reviews; archive alone does not remove published reviews.
+Mobile floating quote CTA hidden ONLY on review page after overlap found in QA.
+
+Owner18081 fiksitt-brand-preview/fiksitt_preview backed up to ignored
+.qa/review-workflow-preview-before.sql, guarded additive migration comparing all
+original columns/row hashes incl reviews. Existing account/content unchanged;
+no fake reviews seeded. Local preview stays running. Production has only stage2:
+stage3 requires explicit approval, backup, migration BEFORE code, verified SMTP
+or manual-link delivery. Rollback workflow code if needed; do not overwrite DB
+or remove new invitation/review rows after real use.
+
+QA isolated fiksitt-reviews-qa18084/18028: core9groups PASS, separate SMTP outage
+variant9groups PASS, HTTP5groups PASS, stage2 reader7groups PASS, PHP lint and JS
+syntax PASS. Core tests expiry/rotation/revoke/scalars/UTF-8/consent/rating,
+SMTP/idempotence, trigger-induced rollback, pending/token consumption, duplicate
+prevention, rating-neutral approval/latest audit, unfinished-job denial and FK
+cascade. HTTP tests auth/CSRF/32KiB/method, no PII/referrer/index, recipient and
+single Mailpit send, token absent from access logs, two concurrent sessions,
+pending visibility, public escaping/low-rating approval/internal-note privacy,
+rejection, used-token acknowledgement and429. Own accounts/requests/invitations/
+reviews removed; final isolated counts all0. HTTP suite resets its container's
+own test rate limits. Never run it against owner preview/production.
+
+CUA manual: create/copy/send invite -> clean-URL form -> stars/consent -> pending
+confirmation -> approve -> public display -> reject -> no public review;
+filter/search, logout, new invitation after prior response and same-document
+invalid/new fragment verified. Customer form320/390/768/844/1440 no overflow,
+stars loaded, controls contained. Admin actual320/390/768/1440 contained; mobile
+table scrolls inside its wrapper. A first inactive-tab viewport test actually
+remained1280 and was discarded; fresh active test tab verified requested sizes.
+Full-page screenshot can offset fixed offscreen skip-link on this browser; DOM
+confirmed skip-link hidden above viewport. This is Chromium, not real Safari.
+Console warnings/errors empty. Temporary viewport reset and agent tabs closed.
+Results/proofs in ignored .qa/review-workflow-*.json, review-form-responsive.json,
+review-admin-responsive.json, review-form-mobile.jpg and
+review-moderation-{desktop,mobile}.jpg. Screenshots with TEST ONLY are synthetic
+fixtures, never production testimonials. QA containers stopped without deleting
+volumes. Stage4 gallery slider/WebP bulk optimization remains pending.
+
+## 32. Stage4 Local Gallery And WebP Uploads, 2026-10-04
+
+User requested stage4. No server deployment or Git commit/push this turn.
+Production remains stage2; owner preview18081 now has stages3+4. Future full-tree
+deploy requires approval, DB/uploads backup and stage3 migration BEFORE code.
+
+New app/gallery.php: featured active rows with valid photos only, cap60,3 desktop/
+2 tablet/85% mobile cards, native scroll-snap, responsive lazy WebPs, escaped
+captions, native full-image anchors, honest empty state. gallery.js arrows/range
+counter/focused-track Left/Right/Home/End; native modal with uncropped contain
+image, arrows/keyboard/Escape/focus restoration, body scroll lock, safe-area/dvh
+fallback and load-error message. No autoplay or dependency; native links work
+without JS/dialog support. Lucide chevron-left/right/expand official assets under
+existing license. Public CSSv12/galleryJSv2/commonJSv6/adminJSv5/adminCSSv6.
+
+86 raw folder photos inspected through contact sheets. Nine existing gallery
+entries preserved, six curated additions7539/7626/7839/7972/8533/9009. Initially
+selected9092 did not match caption; changed to9009 before completion. Others
+not automatically published. tools/optimize-gallery.cjs Sharp cache(false),
+temp encoding then rename (direct overwrite briefly failed on Windows-open file).
+21families full1800/900/320 longest edge, oriented/no upscale/EXIFstrip,
+quality78/76/74. New raw21,450,246bytes -> full WebPs510,380bytes; maximum full
+bundled113,608bytes. All original JPG/foto kept; generated320variants/og WebP.
+Manifest assets/images/gallery-selection.json; report ignored .qa/gallery-optimization.json.
+
+bootstrap preferred_image_path chooses a valid WebP sibling for legacy DB paths;
+image_html full WebP + actual-width sorted/deduplicated320/900/full srcset.
+Hero fallback/OG/Twitter/LocalBusiness/Service photo metadata WebP. service_media
+logical original/default paths retained so custom JPG is not mislabeled Standardbilde.
+Legacy non-WebP fallback remains if sibling missing; convert legacy uploads at
+deployment before claiming all photo requests WebP. Platform PNG/SVG icons exempt.
+Older QA expectations updated for new filename/SEO images, not run through their
+external browser automation; current HTTP/CUA tests provide verification.
+
+app/uploads.php reuses orient_request_photo; actual filesize5MiB inclusive,
+upload-shape/error/MIME/decode validation20MP/12000px. Random40hex base WebP only,
+full1800/900/320, quality78/74, white background, metadata stripped. Staged encoding
+then derivative/base promotion, failures clean temps/new targets. Filesystem+SQL
+are not globally atomic; process crash may leave orphan files. Normal DB failure
+cleanup tested with insert trigger. remove_unused_upload supports jpg/png/webp,
+counts services+gallery across sibling extensions, protects shared families.
+Admin JS live5MiB/type feedback. Private request photo storage untouched.
+
+tools/import-gallery.php CLI-only dry run default; --apply advisory DB lock +
+transaction, skips existing paths, never updates existing rows. Fresh seed has
+same6additions. tools/convert-public-uploads.php dry run default; only managed
+40hex jpg/png, skips valid WebP, preserves originals/DB, never private directory.
+.htaccess blocks tools HTTP. Owner preview guarded CLI backed up DB to
+.qa/gallery-preview-before.sql, converted0 public uploads, added6 entries,
+repeat0. Owner accounts and original content untouched. No stage4 schema change.
+
+Isolated fiksitt-reviews-qa18084/18028: tests/gallery.php5groups (assets/MIME/size/
+srcset/escaping/path safety, empty/single/missing/no-JS links, flags, import
+idempotence/old rows byte-identical, legacy conversion/sibling shared cleanup).
+tests/gallery-http.cjs5groups: auth/CSRF; genuine JPEG/PNG/WebP hostile names ->
+3WebPs, EXIF6 orientation/strip/no JPG output/public XSS; exact5MiB accepted,
+5MiB+1/empty/fake rejected; replacement/delete/shared family references; SQL
+trigger failure cleans outputs. Initial test-only defects corrected (PHP sizes
+object vs JS array, inactive fixture wrongly reused curated-import path).
+Core/HTTP reruns passed; own test data cleaned. Review core9/HTTP5/reader7 also PASS.
+
+CUA manual own synthetic admin: large selection blocked immediately; valid image
+saves; search/320WebP thumbnail/editor loaded;320/390/768/1440 contained tables,
+no document overflow. Public track320/390/768/844/1440, dialog320/390/844 landscape/
+1440 contain controls/photos, no overflow, arrows/keyboard/End disable and Escape/
+focus restore verified. Native horizontal scroll tested, not a physical iPhone
+gesture/Safari/WebKit. Console warnings/errors empty. PHP/JS lint, diff check PASS.
+Proof/results ignored .qa/gallery-{core,http}-results.json, gallery-responsive.json,
+gallery-dialog-responsive.json, gallery-admin-responsive.json, gallery-desktop.jpg,
+gallery-mobile.jpg. QA services stopped without deleting volumes, owner preview
+left running; viewport reset and own tabs closed, user tabs kept. Publication of
+stages3+4 and SMTP activation remain separate future work.
+
+## 33. Local brand redesign (2026-10-04)
+
+User requested the attached blue/red hammer wordmark and pale-yellow palette.
+LOCAL ONLY: no Git push, VPS deployment, DNS, SMTP or account changes. Owner
+preview remains http://127.0.0.1:18081/. Do not use the old 8080 environment.
+
+Palette: blue #164e73, red #bd242b (hover #981b23), yellow #fff3b9, warm-white
+#fffdf5, white #ffffff; ink #203442, muted #526572. Retained historical CSS token
+names to avoid unrelated refactors. Semantic success/danger colors remain.
+Yellow header/contact/process/audience bands, blue headings/links, red primary
+commands. Trust strip is now a full-width band; process steps are unframed.
+Hero retains the real WebP work photograph and existing enquiry CTA. Added the
+reference tagline. Removed duplicate hero trust chips on phones so the next
+section peeks into the first viewport. Short landscape layout is compact.
+Preserved non-sticky mobile header (prior iOS overlap fix), safe-area CTA,
+reduced motion, native gallery, form CSRF and private-photo behavior.
+
+New assets: assets/fiksitt-wordmark-v2.webp (720x300, 45564 bytes),
+assets/fiksitt-hammer-v2.webp (128x128), assets/fiksitt-icon-v2-{32,180,192,512}.png.
+Wordmark/hammer have alpha; PNG launcher icons have a pale-yellow backing.
+PNG remains deliberate for browser/iOS icon compatibility; public photos and
+wordmark are WebP. Old assets retained for rollback but no current template uses
+the green F. Manifest has proper 192/512 icons; touch icon 180; favicon 32.
+LocalBusiness.logo updated; dynamic/static CSP hashes remain valid.
+Public CSS v15, admin CSS v7; public JS v6/gallery JS v2/admin JS v5 unchanged.
+Admin sidebar/login use the new wordmark with a quiet blue/yellow treatment.
+No customer records, settings, credentials or database schemas modified.
+
+IMPORTANT spelling: supplied graphic says "fiksit" (one final t), established
+company/domain says "fiksitt". Optional question sent; no answer received during
+implementation, so preserved uploaded graphic spelling and existing company
+name/domain. Do not silently rename company or domain. Confirm before modifying
+the artwork lettering. The output is an AI-extracted raster, not a vector master.
+
+Image preparation used built-in image_gen (not CLI/API fallback). Original
+reference: codex-clipboard-5ebdeaf8-835d-49b4-8b3c-7e02e6ac80d3.png. Final prompts:
+
+Wordmark: Use case: background-extraction. Asset type: transparent website header wordmark. Edit target: supplied logo. Extract the existing red hammer, blue "fiks", red "it", and exact dark tagline "Din lokale handyman" as one horizontal logo lockup. Preserve the spelling "fiksit", exact shapes, typography, proportions, colors and placement relative to each other. Remove the pale yellow background, all excess empty margins and the lower-right star. True transparent background/alpha, crisp flat clean edges, no checkerboard baked in, no new elements, no shadows. Fit entire complete logo and tagline on a wide landscape canvas with small transparent margins. Do not redesign.
+
+Favicon source: Use case: background-extraction. Asset type: website favicon/app icon. Edit target: supplied logo. Extract ONLY the red tilted hammer symbol from the upper-left of the reference logo. Preserve its exact silhouette, orientation (handle down-left, head top-right), rounded corners and red hue. Center this single hammer with a small margin on a square canvas. True transparent alpha background, clean flat edges. No text, no star, no extra symbols, no yellow background, no square tile, no shadows. Bold and readable at 32px.
+
+tools/prepare-brand.cjs downsizes the generated transparent assets with Sharp;
+does not process or change the user reference. Generated originals remain under
+C:/Users/Anderson/.codex/generated_images/019faac5-4012-7091-a5ef-723a4555661d/.
+
+QA: tests/design-http.cjs PASS: six routes, new icon/manifest dimensions and
+asset byte budgets, form/gallery/review markup, static/dynamic CSP hash match.
+No unsafe-eval added; no forms sent or data writes. PHP and Node syntax PASS.
+CUA responsive 320x740,390x844,768x1024,1024x768,1440x900,844x390: no document
+overflow, all form controls contained, header/logo loaded, next band visible
+in first viewport. Mobile menu opens/closes and Contact anchor works. Gallery
+next/Escape focus return and full-photo display checked; 320/390 dialog controls
+fit. Service detail 390, admin login 320 checked. No authenticated admin workflows
+retested this turn; their markup/layout are unchanged except branding/styles.
+Real Safari/iPhone unavailable. Existing stage3/4 business tests not rerun in
+this styling-only turn. Results .qa/design-responsive.json; screenshots
+.qa/design-home-desktop.png and .qa/design-home-mobile.png. No SMTP test performed.

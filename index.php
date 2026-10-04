@@ -2,6 +2,8 @@
 declare(strict_types=1);
 require_once __DIR__ . '/app/public-layout.php';
 require_once __DIR__ . '/app/phone.php';
+require_once __DIR__ . '/app/reviews.php';
+require_once __DIR__ . '/app/gallery.php';
 start_session();
 public_alias_redirect($_GET ? '?' . http_build_query($_GET) : '', ['index.php', 'index.html']);
 $s = settings();
@@ -9,6 +11,8 @@ $available = true;
 $services = public_services($available);
 $featured = array_slice(array_values(array_filter($services, static fn($r) => (bool)$r['featured'])), 0, 6);
 $gallery = public_gallery();
+$reviewsAvailable = true;
+$reviews = public_reviews($reviewsAvailable);
 $selectedService = is_string($_GET['service'] ?? null) ? $_GET['service'] : '';
 public_head($s['home_seo_title'] ?: 'Møbelmontering og handyman i ' . $s['service_region'] . ' | ' . $s['company_name'], $s['home_seo_description'] ?: 'Møbelmontering, garderober, kjøkken og veggmontering i ' . $s['service_region'] . '. Praktisk hjelp for hjem og bedrifter. Be om et uforpliktende tilbud.', '', business_schema(), true, allowIndex: $available);
 public_header();
@@ -23,7 +27,7 @@ public_header();
           >
           <img
             class="hero-image"
-            src="<?= e(url('assets/images/skyvedorer-speil-soverom.jpg')) ?>"
+            src="<?= e(url('assets/images/skyvedorer-speil-soverom.webp')) ?>"
             width="1275"
             height="1700"
             alt="Montert skyvedørsgarderobe med speil og sort ramme på soverom"
@@ -35,6 +39,7 @@ public_header();
         <div class="hero-content">
           <p class="eyebrow">Møbelmontering og handyman-tjenester i <?= e($s['service_region']) ?></p>
           <h1 id="hero-title"><?= e($s['company_name']) ?></h1>
+          <p class="hero-tagline">Din lokale handyman</p>
           <p class="hero-copy">
             Ryddig og effektiv hjelp med kontormøbler, garderober, kjøkken, hyller,
             TV-fester og små monteringsting hjemme eller på arbeidsplassen.
@@ -110,17 +115,9 @@ public_header();
         </div>
       </section>
 
-      <section class="section gallery-section" id="arbeid" aria-labelledby="gallery-title">
-        <div class="section-heading">
-          <p class="eyebrow">Utført arbeid</p>
-          <h2 id="gallery-title">Et utvalg monteringsjobber</h2>
-          <p>Bildene viser faktiske arbeider fra prosjektmappen: garderober, skyvedører, skapinnredning og tilpassede løsninger.</p>
-        </div>
+      <?php gallery_section($gallery); ?>
 
-        <div class="gallery-grid"><?php foreach ($gallery as $item): ?>
-          <figure class="gallery-card"><?= image_html($item['image'], $item['alt_text']) ?><figcaption><?= e($item['caption']) ?></figcaption></figure>
-        <?php endforeach ?></div>
-      </section>
+      <?php reviews_section($reviews, $reviewsAvailable); ?>
 
       <section class="section proof-section" id="fordeler" aria-labelledby="proof-title">
         <div class="proof-copy">

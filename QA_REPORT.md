@@ -1,5 +1,35 @@
 # Звіт fiksitt
 
+## Галерея робіт, етап4, 4 жовтня 2026
+
+Локально18081/#arbeid: 15 реальних фото, горизонтальний слайдер зі стрілками,
+лічильником видимого діапазону, клавіатурою та великим переглядом без обрізання.
+Збережено9 наявних записів, додано6 фото з папки власника. Решта фото з папки
+не публікується автоматично. Сервер/Git/DNS/Tezamed/SMTP не змінювалися.
+
+21 комплект WebP full/900/320; нові оригінали21,450,246байтів -> великі WebP
+510,380байтів. Найбільший великий WebP113,608байтів. Hero, service/gallery/admin
+фото та фото в SEO використовують WebP; PNG favicon/touch і SVG логотип не фото.
+Ліміт завантаження5MiB включно; MIME/decode/EXIF/metadata/resize перевірені.
+Заявки й приватні фото не переносяться до публічної галереї.
+
+tests/gallery.php5 груп PASS: файли/шляхи/екранування/srcset, порожня/одне/відсутнє
+фото, видимість, повторюваний імпорт зі збереженням старих рядків, legacy/shared
+очищення. tests/gallery-http.cjs5 груп PASS: auth/CSRF, JPEG/PNG/WebP, орієнтація,
+видалення EXIF, небезпечне ім'я, точно5MiB/понад/підробка/порожнє, replacement/
+shared/delete, SQL-збій без залишених файлів. Регресії reviews7/workflow9/HTTP5
+PASS. PHP/JS syntax та diff --check PASS.
+
+Ручний браузерний тест: надмірний файл блокується; дозволений зберігається;
+мініатюра/редактор WebP завантажуються, пошук працює. Адмінка320/390/768/1440,
+галерея320/390/768/844/1440, dialog320/390/844 landscape/1440 без горизонтального
+переповнення; контролі в межах. Стрілки, End, Escape й повернення фокуса пройшли.
+Консоль без помилок. Chromium, не фізичний iPhone/Safari. Без JS перевірені
+нативні посилання в HTML; повний окремий прогін браузера без JS не виконували.
+Бекап власника .qa/gallery-preview-before.sql; імпорт6, повтор0. Дані тестів
+видалені, QA-контейнери зупинені без видалення volumes. Локальний18081 працює.
+Докази .qa/gallery-*.json, gallery-desktop.jpg, gallery-mobile.jpg.
+
 ## Фото в адмінці, 4 жовтня 2026
 
 Локально узгоджено фото в admin services list/editor із публічним fallback.
@@ -346,3 +376,88 @@ content, indexing, SMTP config and Tezamed unchanged. Owner18081 also updated.
 Local Mailpit notification passed. Live email_sent=0 for both synthetic requests:
 real Gmail delivery remains blocked pending valid SMTP app password/OAuth2 and
 owner inbox verification. Enquiries remain available in admin regardless of mail.
+
+# Public Reviews Section Verification (2026-10-04, Local Only)
+
+Previous release pushed to GitHub main at2e0f292. Stage2 changes are local and
+not deployed to VPS. Read-only homepage section and schema foundation only;
+verified invitations/submission/admin moderation remain stage3.
+
+Isolated tests/reviews.php:7groups PASS after final long-text changes. Migration
+twice preserves requests; empty state has no fabricated stars/counts; approved,
+verified, completed and already-published filters plus newest6 order; public
+columns only; XSS escaped; accessible ratings and native long-text disclosure;
+rating range and one-review-per-request; missing-table unavailable state;
+enquiry deletion cascades review. Retained browser fixtures cleaned, final suite
+cleans all its own records. All PHP syntax and git diff --check PASS.
+
+CUA Chromium: populated section at320/390/768/844landscape/1024/1440px has no
+horizontal overflow; cards contained, all30 Lucide star images load. Long review
+opens/closes on desktop and mobile without overflow; mobile menu closes on
+Omtaler selection and heading is unobscured. Owner18081 empty section checked
+320/390/1024, no fake ratings, CTA navigates to#kontakt, console warnings/errors
+empty. Real iOS Safari/WebKit not available. All existing owner preview row
+hashes unchanged after additive migration; backup .qa/reviews-preview-before.sql.
+
+Evidence: .qa/reviews-results.json, reviews-responsive.json,
+reviews-empty-responsive.json, reviews-desktop.jpg, reviews-mobile.jpg and
+reviews-preview.jpg. Populated QA screenshots are TEST ONLY fixtures; owner's
+preview has no fake reviews. QA containers stopped without removing volumes;
+owner preview stays up. VPS, SMTP, DNS and Tezamed unchanged.
+
+# Stage2 Deployment And Stage3 Workflow Verification (2026-10-04)
+
+Stage2 now live at https://fiksitt.online/#omtaler. Complete backup
+reviews-stage2-20261004T095713Z: source/config/uploads, DB, private photos, image
+and pre/post hashes. First attempt stopped on a snapshot-helper table-name error
+before modifications; corrected and used a new backup. Additive reviews table,
+public files and web-only rebuild. All existing row hashes and env/compose hashes
+match. Fiksitt/Tezamed HTTPS200 TLSverify0, public admin403, CSSv7, mobile390
+no overflow. Stage3 remains local: production omtale.php404. Live proof
+.qa/reviews-live.jpg. No Git push this turn.
+
+Stage3 core tests/review-workflow.php:9groups PASS, plus9groups SMTP-failure
+variant. HTTP tests/review-workflow-http.cjs:5groups PASS. Stage2 reader regression:
+7groups PASS. Includes hashed random tokens, completed-only invitation,30-day
+expiry/rotation/revocation, UTF-8 and scalar boundaries, explicit consent,
+original-recipient Mailpit delivery/idempotence, transaction rollback on forced
+token-update failure, pending-only submit, one-time/concurrent replay, approval
+guards, unchanged low ratings/text, latest moderator/private notes, cascade,
+CSRF/auth/body/method/rate limits, no PII or token access-log leak, public escaping
+and withdrawal. Failed SMTP leaves valid invite and no acceptance flag. No actual
+Gmail inbox delivery claimed. Final isolated requests/reviews/invitations/admins0.
+
+Manual CUA: create/copy/send -> client form -> success -> pending moderation ->
+approval -> public view -> rejection -> hidden. Status/search filters and logout
+PASS. New invitation after an earlier response, same-page fragment change and
+invalid token clearing old grant PASS. Customer widths320/390/768/844/1440 and
+admin actual320/390/768/1440 have no body overflow; controls/icons load and fit.
+Mobile table scrolls internally. Found/fixed quote CTA overlapping submit button
+on review route, and scoped Apache referrer override. A stale/inactive tab's1280
+measurements were discarded and responsive tests rerun on a fresh tab. Full-page
+capture may misplace the offscreen fixed skip link; live DOM proves it is hidden.
+Console warnings/errors empty. Chromium only; real iOS Safari not available.
+
+Owner18081 migrated after DB backup; all original columns/rows unchanged, account
+preserved, no fake reviews. Stage3 not uploaded to VPS or Git. PHP/JS syntax and
+git diff --check PASS. QA services stopped without volume removal; owner preview
+left running. Evidence in .qa/review-workflow-results.json,
+review-workflow-mail-failure.json, review-workflow-http-results.json,
+review-form-responsive.json, review-admin-responsive.json, screenshots of form/
+moderation. TEST ONLY screenshot entries are disposable fixtures, not customers.
+
+## Local Brand Redesign (2026-10-04)
+
+Read-only tests/design-http.cjs PASS: home/catalog/detail/admin login/review/404,
+versioned icons, manifest dimensions, asset byte budgets, dynamic and static CSP.
+PHP/Node syntax checks PASS. User forms and database records untouched.
+CUA manual: mobile menu and Contact anchor; gallery next/close/Escape; dialog
+controls fit at 320/390; detail at390/admin login at320. Final public responsive
+checks320/390/768/1024/1440 plus844x390: no body/field overflow, logo loads, next
+section visible in first viewport. Header is non-sticky below980 as before.
+Public CSSv15/admin CSSv7. Evidence .qa/design-responsive.json and
+.qa/design-home-{desktop,mobile}.png. Real iPhone Safari unavailable; authenticated
+admin workflows and full business regression not rerun for this styling-only
+change. No server deployment, Git push, account changes or SMTP activation.
+Uploaded artwork spelling fiksit retained pending owner confirmation; configured
+company/domain remains fiksitt. Prompt/asset provenance: CODEX_HANDOFF section33.

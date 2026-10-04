@@ -291,3 +291,47 @@ SMTP login вимагає шифрування; `none` дозволено лиш
 fiksitt-seo-qa (18082 / Mailpit 18026), перевіряє точний local env/DB/SMTP.
 Створює та прибирає власні тестові записи. Не запускається паралельно з QA,
 що зупиняє DB/Mailpit. Ручні сценарії й обмеження: `MANUAL_QA.md`.
+
+## Production SMTP: 2026-10-04
+
+Read-only audit confirmed `smtp.gmail.com:587`, TLS, configured SMTP username,
+but **no SMTP password**. Recipient is `masxpros@gmail.com`. Real notification
+delivery is not enabled. Local Mailpit tests do not deliver to Gmail.
+
+Recommended next connection: a transactional SMTP service such as Brevo.
+Buying the domain alone does not create a mailbox or an SMTP account.
+
+1. The owner creates a Brevo account and enables transactional sending.
+2. Add `fiksitt.online` in Senders / Domains. Copy the exact verification,
+   DKIM and DMARC records shown by the provider into the current DNS zone.
+   Do not replace NS, website A/CNAME records, or Tezamed records. Do not
+   invent SPF records or add a second SPF policy; follow the provider's
+   instructions and merge existing policies when needed. MX is required
+   for receiving mail in a real domain mailbox, not simply for SMTP relay.
+3. Verify a sender such as `notifications@fiksitt.online` in the provider.
+4. Generate an **SMTP key**, not an API key, and obtain the SMTP login.
+   Fill the private local file
+   `C:/Users/Anderson/.codex/private/fiksitt-mail/brevo.smtp.env`.
+   This file is outside the repository and restricted to the owner/SYSTEM.
+   Never send the key in chat, screenshots or Git.
+5. After confirmation, transfer the credentials over SSH into the existing
+   protected production environment. Use `smtp-relay.brevo.com`, port 587,
+   explicit STARTTLS, the provider's SMTP login and SMTP key. Recreate only
+   the Fiksitt web service. Do not reset administrator credentials or DB.
+6. Send one labeled test to the administrator, check SMTP acceptance,
+   provider logs and the recipient's inbox/spam folder. Then test one form
+   submission and clean only its own test fixture. Never bulk-resend old
+   requests without reviewing which emails were already accepted.
+
+Current logic: customer submits form -> validation/CSRF/rate limits ->
+request and private photos saved -> SMTP notification attempted -> saved
+request remains available if SMTP fails. Email contains the description,
+contact details, photo count and an authenticated admin link; private
+photos are not published or attached to outbound emails. Customer email
+is Reply-To, never an unverified From address. Review invitations also
+use SMTP, but are sent only by an authenticated administrator for completed
+jobs with a customer email address.
+
+Provider documentation:
+- https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP
+- https://help.brevo.com/hc/en-us/articles/7959631848850-Create-and-manage-your-SMTP-keys

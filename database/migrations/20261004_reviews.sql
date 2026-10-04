@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS reviews (
+ id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ request_id INT UNSIGNED NOT NULL UNIQUE,
+ display_name VARCHAR(80) NOT NULL,
+ rating TINYINT UNSIGNED NOT NULL,
+ body VARCHAR(1500) NOT NULL,
+ status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+ verified_at DATETIME NULL,
+ published_at DATETIME NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ CONSTRAINT review_request FOREIGN KEY (request_id) REFERENCES contact_requests(id) ON DELETE CASCADE,
+ CONSTRAINT review_rating CHECK (rating BETWEEN 1 AND 5),
+ INDEX review_publication (status,published_at,id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

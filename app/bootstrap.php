@@ -152,17 +152,27 @@ function image_dimensions(string $path): array|false
     return $cache[$path];
 }
 
-function image_html(string $path, string $alt, string $class = '', bool $lazy = true, string $sizes = '(max-width: 760px) 100vw, 480px'): string
+function preferred_image_path(string $path): string
 {
     $path = image_path($path);
+    if ($path === '') return '';
+    $webp = preg_replace('/\.(?:jpe?g|png)$/i', '.webp', $path);
+    return image_dimensions($webp) ? $webp : $path;
+}
+
+function image_html(string $path, string $alt, string $class = '', bool $lazy = true, string $sizes = '(max-width: 760px) 100vw, 480px'): string
+{
+    $path = preferred_image_path($path);
     if ($path === '') return '';
     $size = image_dimensions($path);
     if (!$size) return '';
     $variants = [];
     foreach ([320, 900] as $width) {
-        $webp = preg_replace('/\\.jpe?g$/', '-' . $width . '.webp', $path);
+        $webp = preg_replace('/\\.(?:jpe?g|png|webp)$/i', '-' . $width . '.webp', $path);
         if ($webp !== $path && ($dimensions = image_dimensions($webp))) $variants[$dimensions[0]] = e(url($webp)) . ' ' . $dimensions[0] . 'w';
     }
+    if (str_ends_with($path, '.webp')) $variants[$size[0]] = e(url($path)) . ' ' . $size[0] . 'w';
+    ksort($variants);
     $source = $variants ? '<source type="image/webp" srcset="' . implode(', ', $variants) . '" sizes="' . e($sizes) . '">' : '';
     return '<picture>' . $source . '<img class="' . e($class) . '" src="' . e(url($path)) . '" width="' . $size[0] . '" height="' . $size[1] . '" alt="' . e($alt) . '" decoding="async"' . ($lazy ? ' loading="lazy"' : '') . '></picture>';
 }

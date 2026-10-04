@@ -261,7 +261,7 @@ Results and responsive screenshots are written to ignored `.qa/`. Tests cover se
 2. Select PHP 8.2+ with PDO MySQL, mbstring, fileinfo, GD and OpenSSL.
 3. Create a database and application user in cPanel MySQL Databases; grant rights only on this database.
 4. In phpMyAdmin import `database/schema.sql`, then `database/seed.sql` for a fresh installation.
-5. Upload `index.php`, `tjenester.php`, `contact.php`, `404.php`, `robots.php`, `sitemap.php`, `styles.css`, `script.js`, `site.webmanifest`, `.htaccess`, `config.example.php`, `app/`, `admin/`, and `assets/` into `public_html`.
+5. Upload `index.php`, `tjenester.php`, `contact.php`, `omtale.php`, `404.php`, `robots.php`, `sitemap.php`, `styles.css`, `script.js`, `review.js`, `site.webmanifest`, `.htaccess`, `config.example.php`, `app/`, `admin/`, and `assets/` into `public_html`.
 6. Create server-only `config.php`, configure the full trusted URL, database credentials, verified sender/recipient, SMTP encryption/authentication, and random setup token. Do not copy local development passwords.
 7. Enable SSL in cPanel. Once verified, enable the HTTPS redirect near the bottom of `.htaccess`. Ensure PHP receives the hosting HTTPS indicator correctly.
 8. Open the website/catalog, create the first admin, then remove the setup token.
@@ -350,9 +350,166 @@ This suite deliberately simulates local failures; never target production or
 the owner's preview. It cleans its own random records unless QA_KEEP_FOR_UI=1.
 See QA_REPORT.md and CODEX_HANDOFF.md section29 for verification and deployment.
 
-Reviews, review verification and the portfolio slider remain stages2-4; they
-are not included in this change. Existing gallery photos are not bulk-converted.
+Stages3 and4 are implemented locally below; production still has stage2 only.
+
+## Public Reviews Section (Stage 2, Deployed, 2026-10-04)
+
+The homepage now has `#omtaler` after the portfolio, plus header/footer links.
+It displays up to6 newest approved reviews with a verified timestamp, a past
+publication timestamp and a linked completed enquiry. Only public display name,
+rating, text, publication date and service are selected; enquiry contact data
+and private photos are never rendered. Text is escaped. Long reviews use a
+native disclosure, ratings have accessible labels and official Lucide icons.
+An empty database shows an honest no-reviews state without stars or fake counts;
+a database failure shows temporary unavailability. No aggregate rating schema
+or fabricated testimonials were added.
+
+Production currently has this read-only stage. Stage3 is local only, as described
+below. Do not manually approve unverified reviews just to fill the section. The
+owner's preview at http://127.0.0.1:18081/#omtaler has an empty reviews table;
+existing content/accounts were preserved. Stage2 is now live at
+https://fiksitt.online/#omtaler. Deployment backup:
+`/opt/lily-montering/backups/reviews-stage2-20261004T095713Z`.
+
+Before a future approved deployment, back up production and apply ONLY
+`database/migrations/20261004_reviews.sql` to the existing database; never
+re-import seed data. Fresh installations include the table in schema.sql.
+Reviews have one row per enquiry, a1-5 rating constraint and cascade on enquiry
+deletion. Archive does not delete the linked review.
+
+Isolated CLI verification: `tests/reviews.php`, Docker project
+`fiksitt-reviews-qa`, APP_ENV=local, APP_URL=http://127.0.0.1:18084,
+DB_NAME=fiksitt_reviews_qa. The suite rejects other targets, simulates a missing
+table and cleans its own synthetic records. Seven groups PASS; responsive
+browser checks cover320/390/768/844/1024/1440px. See QA_REPORT.md and
+CODEX_HANDOFF.md section30. Screenshot evidence and local backup remain in
+ignored `.qa/`, not Git.
+
+## Verified Review Workflow (Stage 3, Local Only, 2026-10-04)
+
+No customer registration is required. In admin Forespørsler, open a completed,
+non-archived enquiry and choose Opprett invitasjon. The personal link can be
+copied and shared with that customer. If the enquiry has a valid email, Send
+invitasjon på e-post uses the existing verified SMTP sender and that customer's
+original enquiry address. Sending is explicit, never triggered automatically
+by a status change. A normal repeated send does not duplicate accepted mail.
+SMTP acceptance is not proof of inbox delivery; failures leave the link usable.
+Production SMTP remains unactivated, so use manual delivery until configured.
+
+Invitations use256-bit random secrets, hash-only database storage, a30-day
+expiry and one review per enquiry. Creating a replacement invalidates the old
+link and any old session grant; Trekk tilbake revokes an unused link. The raw
+secret is retained only in the admin session for30minutes to support copying/
+sending, not in database rows. Expired session links cannot be retrieved from
+the database; create a replacement. Completed jobs with existing reviews cannot
+receive another invitation. Possession of the privately delivered invitation
+confirms its association with a completed enquiry, not a legal identity check.
+
+The link uses `omtale.php#token=...`. The fragment is not sent in GET URLs or
+access logs; review.js clears it from browser history and exchanges the secret
+by CSRF-protected POST for a30-minute session grant. This also works for another
+invitation in an existing review page/session. Without JS, open omtale.php and
+paste the code or full personal link into the native form. Pages are no-store,
+noindex/nofollow and no-referrer, without third-party resources. Never configure
+request-body logging on this route or publish personal links. Production must
+use HTTPS. Public clients never receive enquiry contact fields or private photos.
+
+The customer chooses1-5 stars, a public name (up to80characters), review text
+(10-1500characters) and explicit publication consent. Valid submission atomically
+creates a verified pending review and consumes the invitation. Concurrent replay,
+revocation, expiry, non-completed jobs and duplicates are blocked. Public POST
+bodies are limited to32KiB, with per-IP and per-invitation rate limits. No photo
+uploads are accepted on this route; the5MiB enquiry-photo limit is unchanged.
+
+Admin Omtaler lists pending reviews by default, with search/status/pagination,
+enquiry links and protected approve/reject/unpublish actions. Only a verified
+review for a completed job can be approved. Public text/rating cannot be edited
+by admin. Latest moderator ID/time and an internal note are saved; this is not a
+full chronological audit log. Moderation should use the same criteria for all
+ratings, not remove legitimate criticism. Private notes never appear publicly.
+The dashboard includes a pending-review count. Existing public/admin isolation
+on the VPS must remain unchanged; access admin through the private SSH tunnel.
+
+Current stage3 preview: http://127.0.0.1:18081/admin/reviews/. No fake reviews or
+new owner accounts were inserted. A guarded migration preserved all original
+rows/columns; local DB backup is `.qa/review-workflow-preview-before.sql`.
+For a future approved deployment, back up DB/files/private photos, apply the
+stage2 migration if absent, then ONLY `20261004_review_workflow.sql` before
+deploying workflow PHP/JS/CSS and .htaccess. The upgrade SQL is tested with the
+project's MariaDB10.11; its ADD COLUMN IF NOT EXISTS syntax needs adaptation
+before use on a different database engine. Never import seed data on upgrade.
+
+Tests in isolated fiksitt-reviews-qa18084/18028: `tests/review-workflow.php`
+(9groups), SMTP-failure variant, `tests/review-workflow-http.cjs` (5groups), plus
+the stage2 reader regression (7groups). HTTP tests create/delete their own
+synthetic account/enquiry and reset ONLY the isolated container's rate limits;
+do not run concurrently with browser QA. See CODEX_HANDOFF.md section31.
+
+## Work Gallery (Stage 4, Local Only, 2026-10-04)
+
+Preview: http://127.0.0.1:18081/#arbeid. Fifteen real work photographs are
+available: nine existing entries and six curated additions from the owner's
+86-photo folder. The remaining originals are not automatically published.
+Admin -> Bilder retains captions, Norwegian alt text, active/featured flags,
+ordering, replacement and deletion. Featured active entries appear in the
+portfolio, ordered by sort_order/id, capped at60. Missing photos are omitted;
+an empty gallery has a truthful empty state.
+
+Native CSS scroll-snap supports horizontal touch scrolling. gallery.js adds
+arrows, visible-range counter and focused-track Left/Right/Home/End. Clicking a
+photo opens a native dialog with uncropped full image, previous/next, Escape,
+focus restoration, scroll lock and safe-area padding. No autoplay or third-party
+slider dependency. Without JS/dialog support, native full-WebP links still work.
+Browser tests used Chromium, not a physical iPhone/Safari.
+
+All displayed project photos, hero, thumbnails and photo metadata resolve to
+WebP. Existing JPG paths remain compatible by selecting a valid sibling WebP;
+legacy files and customer-managed DB paths are preserved. Brand SVGs and platform
+PNG touch/favicon icons are not photographs. Twenty-one bundled photo families
+have full/900/320 maximum-edge variants, actual-width srcsets, lazy loading and
+explicit dimensions. Six new originals total21,450,246bytes; their full WebPs
+total510,380bytes. Largest bundled full WebP113,608bytes. Future upload sizes vary.
+
+Admin uploads accept real JPEG/PNG/WebP up to **5MiB (5,242,880bytes)** each,
+exact boundary included. Browser feedback and server actual-file size/MIME/decode
+checks reject empty/fake/oversized files and unsupported HEIC/SVG/HTML/PHP.
+Sources are limited to20MP/12000px. EXIF orientation is applied, metadata stripped,
+transparency flattened onto white. Only random-name full/900/320 WebPs are saved,
+max1800px longest edge, no upscaling. Encodings are staged before promotion;
+failed DB saves clean unused outputs. Shared service/gallery references protect
+families, including legacy JPG/WebP siblings. Private enquiry photos are unchanged
+and NEVER automatically imported into the public gallery.
+Enable PHP exif for JPEG orientation on cPanel; Docker already includes it.
+
+`tools/optimize-gallery.cjs` uses Sharp via NODE_PATH for asset generation only;
+PHP does not require Node/Sharp at runtime. Originals are ignored and untouched.
+`assets/images/gallery-selection.json` has curated paths/captions/alt texts;
+fresh seed.sql includes them. Existing-installation upgrade: back up DB/uploads,
+deploy code and assets together, then use PHP CLI (never re-import seed):
+
+```sh
+php tools/convert-public-uploads.php          # dry run
+php tools/convert-public-uploads.php --apply  # preserve originals and DB paths
+php tools/import-gallery.php                # dry run
+php tools/import-gallery.php --apply         # additive, idempotent
+```
+
+Include gallery.js, app/gallery.php, complete photo families/manifest, templates,
+image/upload helpers, CSS, admin JS and HTTP-blocked CLI tools in deployment.
+For cPanel, add gallery.js to the upload list above. No stage4 schema migration;
+stage3's migration is still required if publishing the whole working tree.
+Owner preview backup `.qa/gallery-preview-before.sql`: six entries added once,
+repeat import added0. Production, DNS, Tezamed, SMTP and Git untouched this turn.
+QA: tests/gallery.php5groups, tests/gallery-http.cjs5groups, manual admin uploads
+and responsive slider/dialog checks. See CODEX_HANDOFF.md section32.
 
 ## Remaining business information
+
+Local brand redesign uses the supplied blue/red hammer logo with yellow/white
+bands and red CTAs. Preview: http://127.0.0.1:18081/. Public CSSv15/admin CSSv7;
+include new assets/fiksitt-*-v2* icons and wordmark plus site.webmanifest when
+deploying. No database migration is required for branding. No push/deployment
+performed. Supplied artwork says fiksit; configured company/domain remains
+fiksitt pending confirmation. See CODEX_HANDOFF section33 and QA_REPORT.
 
 Public phone, public email, organization number and social links remain blank until provided. Østlandet should be confirmed. Prices and durations are optional. The VPS uses https://fiksitt.online with HTTPS; public_domain and SEO indexing remain intentionally disabled in settings. Real SMTP activation and inbox verification are still required. This repository does not deploy itself to hosting.

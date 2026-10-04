@@ -1,0 +1,38 @@
+[
+  {
+    "image": "assets/images/hjornegarderobe.webp",
+    "caption": "Hjørnegarderobe",
+    "alt_text": "Hvit hjørnegarderobe med åpne hyller og skuffer",
+    "sort_order": 9
+  },
+  {
+    "image": "assets/images/hvite-skyvedorer.webp",
+    "caption": "Hvite skyvedører",
+    "alt_text": "Hvite skyvedører foran garderobeinnredning",
+    "sort_order": 10
+  },
+  {
+    "image": "assets/images/tregarderobe-med-skuffer.webp",
+    "caption": "Tregarderobe med skuffer",
+    "alt_text": "Garderobe i lyst tre med hyller, skuffer og hengestang",
+    "sort_order": 11
+  },
+  {
+    "image": "assets/images/speilgarderobe-soverom.webp",
+    "caption": "Speilgarderobe på soverom",
+    "alt_text": "Garderobe med store speilskyvedører på soverom",
+    "sort_order": 12
+  },
+  {
+    "image": "assets/images/skyvedorer-morkt-tre.webp",
+    "caption": "Skyvedører i mørkt tre",
+    "alt_text": "Garderobe med skyvedører i mørkt tre og sort ramme",
+    "sort_order": 13
+  },
+  {
+    "image": "assets/images/hvitt-garderoberom.webp",
+    "caption": "Hvitt garderoberom",
+    "alt_text": "Hvitt garderoberom med åpne hyller og skuffer på begge sider",
+    "sort_order": 14
+  }
+]

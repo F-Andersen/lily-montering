@@ -17,7 +17,8 @@ async function main() {
   assert(!message.includes("LILY"));
   const admin = php("require 'app/admin-layout.php'; start_session(); $_SESSION=[]; admin_header('Oversikt'); admin_footer();");
   assert.match(admin, /fiksitt admin/);
-  assert.match(admin, /alt="">fiksitt<\/a>/);
+  assert.match(admin, /aria-label="fiksitt admin"/);
+  assert.match(admin, /fiksitt-wordmark-v2\.webp/);
   assert(!admin.includes("LILY"));
   const staticHome = fs.readFileSync("index.html", "utf8");
   const staticJson = staticHome.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1];
@@ -55,7 +56,7 @@ async function main() {
   const manifest = await (await context.request.get("/site.webmanifest?v=fiksitt")).json();
   assert.equal(manifest.name, "fiksitt");
   assert.equal(manifest.short_name, "fiksitt");
-  for (const path of ["assets/fiksitt-mark.svg", ...manifest.icons.map(icon => icon.src)]) {
+  for (const path of ["assets/fiksitt-wordmark-v2.webp", "assets/fiksitt-icon-v2-32.png", "assets/fiksitt-icon-v2-180.png", ...manifest.icons.map(icon => icon.src)]) {
     const response = await context.request.get("/" + path);
     assert.equal(response.status(), 200);
     assert((await response.body()).length > 100);

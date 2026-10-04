@@ -3,7 +3,31 @@ document.querySelectorAll("form[data-confirm]").forEach((form) => {
     if (!window.confirm(form.dataset.confirm)) event.preventDefault();
   });
 });
+document.querySelectorAll('[data-copy-target]').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const input = document.getElementById(button.dataset.copyTarget);
+    const status = button.parentElement.querySelector('[data-copy-status]');
+    try {
+      await navigator.clipboard.writeText(input.value);
+      status.textContent = 'Lenken er kopiert.';
+    } catch {
+      input.focus();
+      input.select();
+      status.textContent = 'Kunne ikke kopiere lenken.';
+    }
+  });
+});
 const navigation = document.querySelector(".admin-nav");
+document.querySelectorAll('[data-public-image]').forEach(input => {
+  const status = input.parentElement.querySelector('[data-upload-status]');
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    const error = file && (file.size === 0 || file.size > 5 * 1024 * 1024) ? 'Bildet kan være høyst 5 MB og må inneholde et bilde.' : file && !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) && !(file.type === '' && /\.(jpe?g|png|webp)$/i.test(file.name)) ? 'Velg JPEG-, PNG- eller WebP-bilder.' : '';
+    input.setCustomValidity(error);
+    status.textContent = error || (file ? `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)` : '');
+    if (error) input.reportValidity();
+  });
+});
 const small = window.matchMedia("(max-width: 760px)");
 if (navigation) {
   const update = () => { navigation.open = !small.matches; };

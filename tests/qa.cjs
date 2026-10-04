@@ -100,7 +100,7 @@ async function main() {
   let service = sql("SELECT * FROM services WHERE slug=?", [slug])[0];
   assert(service);
   uploads.push(service.image);
-  assert.match(service.image, /^assets\/uploads\/[a-f0-9]{40}\.jpg$/);
+  assert.match(service.image, /^assets\/uploads\/[a-f0-9]{40}\.webp$/);
   assert.equal((await context.request.get("/" + service.image)).status(), 200);
   assert.equal((await context.request.get("/tjenester/" + slug)).status(), 200);
   assert.match(await (await context.request.get("/tjenester/" + slug)).text(), /&lt;script&gt;/);
@@ -338,8 +338,8 @@ main().catch(error => {
     sql("DELETE FROM gallery_items WHERE caption LIKE ?", ["QA " + suffix + "%"]);
     sql("DELETE FROM service_categories WHERE slug=?", [slug + "-category"]);
     sql("DELETE FROM admins WHERE email=?", [email]);
-    for (const path of [...uploads, ...serviceImages, ...galleryImages]) if (/^assets\/uploads\/[a-f0-9]{40}\.jpg$/.test(path)) {
-      for (const file of [path, path.replace(/\.jpg$/, "-320.webp"), path.replace(/\.jpg$/, "-900.webp")]) if (fs.existsSync(file)) fs.unlinkSync(file);
+    for (const path of [...uploads, ...serviceImages, ...galleryImages]) if (/^assets\/uploads\/[a-f0-9]{40}\.(?:jpg|webp)$/.test(path)) {
+      for (const file of [path, path.replace(/\.(?:jpg|webp)$/, "-320.webp"), path.replace(/\.(?:jpg|webp)$/, "-900.webp")]) if (fs.existsSync(file)) fs.unlinkSync(file);
     }
     clearLimits();
   } catch (error) { console.error("QA cleanup failed:", error.message); process.exitCode = 1; }

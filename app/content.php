@@ -23,8 +23,12 @@ function public_services(bool &$available): array
 
 function public_gallery(): array
 {
-    try { return query('SELECT * FROM gallery_items WHERE active = 1 AND featured = 1 ORDER BY sort_order,id LIMIT 12')->fetchAll(); }
-    catch (Throwable $error) { safe_log('public gallery unavailable', $error); return fallback_content()['gallery']; }
+    try { return query('SELECT * FROM gallery_items WHERE active = 1 AND featured = 1 ORDER BY sort_order,id LIMIT 60')->fetchAll(); }
+    catch (Throwable $error) {
+        safe_log('public gallery unavailable', $error);
+        $selection = json_decode(@file_get_contents(dirname(__DIR__) . '/assets/images/gallery-selection.json') ?: '[]', true);
+        return [...fallback_content()['gallery'], ...(is_array($selection) ? $selection : [])];
+    }
 }
 
 function contact_services(): array
