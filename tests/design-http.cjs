@@ -16,7 +16,7 @@ async function main() {
     assert(!response.headers.get('content-security-policy').includes('unsafe-eval'));
     if (route === '/' || route.startsWith('/tjenester')) {
       assert.match(html, /fiksitt-wordmark-v2\.webp/);
-      assert.match(html, /styles\.css\?v=16/);
+      assert.match(html, /styles\.css\?v=20261005-3/);
       const json = html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)?.[1];
       if (json) {
         assert(response.headers.get('content-security-policy').includes('sha256-' + crypto.createHash('sha256').update(json).digest('base64')));
@@ -29,16 +29,27 @@ async function main() {
       assert.match(html, /data-gallery/);
       assert.match(html, /id="omtaler"/);
       assert.match(html, /name="csrf"/);
+      assert.match(html, /data-gallery-page/);
+      const photoCount = (html.match(/data-gallery-open=/g) || []).length;
+      assert(photoCount > 0);
+      assert.equal((html.match(/data-gallery-page/g) || []).length, Math.ceil(photoCount / 4));
+      assert(html.indexOf('id="arbeid"') < html.indexOf('id="tjenester"'), 'Portfolio follows hero benefits');
+      assert.match(html, /og-montering-900\.webp[^]*?900w/);
+      assert.match(html, /width="1200"[^]*?height="630"/);
       assert.equal(JSON.parse(html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1]).logo, base + '/assets/fiksitt-wordmark-v2.webp');
     }
   }
-  const manifest = await (await fetch(base + '/site.webmanifest?v=2')).json();
-  const css = await (await fetch(base + '/styles.css?v=16')).text();
-  assert.match(css, /--brand-coral: #f6cccf/);
-  assert.match(css, /--brand-blue-soft: #e7eff8/);
+  const manifest = await (await fetch(base + '/site.webmanifest?v=3')).json();
+  const css = await (await fetch(base + '/styles.css?v=20261005-3')).text();
+  assert.match(css, /--paper: #fafaf8/);
+  assert.match(css, /--oak: #d6bc99/);
+  assert.match(css, /--ink: #303331/);
+  assert(!css.includes('linear-gradient'), 'Real photographic hero without gradient');
+  assert.match(css, /\.gallery-page/);
+  assert.match(css, /prefers-reduced-motion/);
   assert(!/--pine|--green|#12382b|#12372b|#e4efe8/i.test(css));
   assert.equal(manifest.name, 'fiksitt');
-  assert.equal(manifest.theme_color, '#fff3b9');
+  assert.equal(manifest.theme_color, '#fafaf8');
   for (const [asset, width, height] of [['assets/fiksitt-wordmark-v2.webp',720,300],['assets/fiksitt-hammer-v2.webp',128,128],['assets/fiksitt-icon-v2-32.png',32,32],['assets/fiksitt-icon-v2-180.png',180,180], ...manifest.icons.map(icon=>[icon.src, ...icon.sizes.split('x').map(Number)])]) {
     const response = await fetch(base + '/' + asset);
     assert.equal(response.status, 200);
@@ -56,6 +67,6 @@ async function main() {
   }
   const staticJson = fs.readFileSync('index.html','utf8').match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1];
   assert(fs.readFileSync('.htaccess','utf8').includes('sha256-' + crypto.createHash('sha256').update(staticJson).digest('base64')));
-  console.log('PASS redesign: 6 routes, new logo/icons/manifest dimensions and byte budgets, form/gallery/review markup, dynamic and static CSP hashes. No data writes or forms sent.');
+  console.log('PASS reference redesign: 6 routes, neutral/oak palette, 15 photos in 4 mosaics, responsive WebP hero, logo/icon byte budgets, form/review markup, dynamic and static CSP hashes. No data writes or forms sent.');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

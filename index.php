@@ -22,14 +22,14 @@ public_header();
         <picture>
           <source
             type="image/webp"
-            srcset="<?= e(url('assets/images/skyvedorer-speil-soverom-900.webp')) ?> 675w, <?= e(url('assets/images/skyvedorer-speil-soverom.webp')) ?> 1275w"
+            srcset="<?= e(url('assets/images/og-montering-900.webp')) ?> 900w, <?= e(url('assets/images/og-montering.webp')) ?> 1200w"
             sizes="100vw"
           >
           <img
             class="hero-image"
-            src="<?= e(url('assets/images/skyvedorer-speil-soverom.webp')) ?>"
-            width="1275"
-            height="1700"
+            src="<?= e(url('assets/images/og-montering.webp')) ?>"
+            width="1200"
+            height="630"
             alt="Montert skyvedørsgarderobe med speil og sort ramme på soverom"
             fetchpriority="high"
             decoding="async"
@@ -37,40 +37,44 @@ public_header();
         </picture>
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-content">
-          <p class="eyebrow">Møbelmontering og handyman-tjenester i <?= e($s['service_region']) ?></p>
-          <h1 id="hero-title"><?= e($s['company_name']) ?></h1>
-          <p class="hero-tagline">Din lokale handyman</p>
+          <p class="eyebrow"><?= e($s['company_name']) ?> · Din lokale handyman</p>
+          <h1 id="hero-title">Møbelmontering<br>for hjemmet ditt.</h1>
           <p class="hero-copy">
-            Ryddig og effektiv hjelp med kontormøbler, garderober, kjøkken, hyller,
-            TV-fester og små monteringsting hjemme eller på arbeidsplassen.
+            Fra garderoben til den siste hyllen. Vi monterer møbler og løser
+            praktiske oppgaver hjemme og på jobb i <?= e($s['service_region']) ?>.
           </p>
           <div class="hero-actions" aria-label="Hovedhandlinger">
             <a class="button button-primary" href="#kontakt"><?= e($s['primary_cta']) ?></a>
             <a class="button button-secondary" href="#arbeid">Se utført arbeid</a>
           </div>
-          <ul class="trust-list" aria-label="Viktige fordeler">
-            <li>Holder avtalt tid</li>
-            <li>Ryddig utførelse</li>
-            <li>Løser vanskelige detaljer</li>
-            <li>Små jobber tas seriøst</li>
-          </ul>
+          <p class="hero-note">Nøyaktig montert. Ryddig levert.</p>
         </div>
       </section>
 
       <section class="trust-strip" aria-label="Trygghet før bestilling">
         <div>
-          <strong>Profesjonell</strong>
-          <span>Riktig verktøy, stødig montering og tydelig avklaring.</span>
+          <span class="benefit-number" aria-hidden="true">01</span>
+          <strong>Tydelig avklaring</strong>
+          <span>Vi avklarer omfang og detaljer før arbeidet starter.</span>
         </div>
         <div>
-          <strong>Presis</strong>
+          <span class="benefit-number" aria-hidden="true">02</span>
+          <strong>Nøyaktig montering</strong>
           <span>Skap, fronter, skinner og beslag justeres nøye.</span>
         </div>
         <div>
-          <strong>Praktisk</strong>
-          <span>Kontor, hjem, skole, barnehage og næringslokaler.</span>
+          <span class="benefit-number" aria-hidden="true">03</span>
+          <strong>Ryddig utførelse</strong>
+          <span>Arbeidsområdet holdes ryddig gjennom hele jobben.</span>
+        </div>
+        <div>
+          <span class="benefit-number" aria-hidden="true">04</span>
+          <strong>Holder avtalt tid</strong>
+          <span>Et praktisk tidspunkt for hjemmet eller arbeidsplassen.</span>
         </div>
       </section>
+
+      <?php gallery_section($gallery); ?>
 
       <section class="section section-intro" id="tjenester" aria-labelledby="services-title">
         <div class="section-heading">
@@ -114,8 +118,6 @@ public_header();
           </article>
         </div>
       </section>
-
-      <?php gallery_section($gallery); ?>
 
       <?php reviews_section($reviews, $reviewsAvailable); ?>
 

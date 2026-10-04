@@ -50,6 +50,7 @@ if (menuToggle && primaryNav) {
       closeMenu();
     }
   });
+  window.matchMedia("(max-width: 980px)").addEventListener("change", closeMenu);
 }
 
 function setFieldValidity(form, changedField = null) {

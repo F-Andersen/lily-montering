@@ -1,6 +1,7 @@
 document.querySelectorAll('[data-gallery]').forEach(gallery => {
   const track = gallery.querySelector('.gallery-track');
   const links = [...track.querySelectorAll('[data-gallery-open]')];
+  const pages = [...track.querySelectorAll('[data-gallery-page]')];
   const dialog = gallery.querySelector('dialog');
   const image = dialog.querySelector('[data-dialog-image]');
   const caption = dialog.querySelector('#gallery-dialog-caption');
@@ -8,18 +9,23 @@ document.querySelectorAll('[data-gallery]').forEach(gallery => {
   const next = gallery.querySelector('[data-gallery-next]');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let current = 0, opener = null, frame = 0;
-  const position = () => links.reduce((best, link, index) => Math.abs(link.offsetLeft - track.scrollLeft) < Math.abs(links[best].offsetLeft - track.scrollLeft) ? index : best, 0);
+  const mobile = window.matchMedia('(max-width: 680px)');
+  // Mobile advances individual photos; desktop advances four-photo mosaics.
+  const slides = () => mobile.matches ? links : pages;
+  const left = slide => slide.getBoundingClientRect().left - track.getBoundingClientRect().left + track.scrollLeft;
+  const position = () => slides().reduce((best, slide, index, all) => Math.abs(left(slide) - track.scrollLeft) < Math.abs(left(all[best]) - track.scrollLeft) ? index : best, 0);
   const update = () => {
     frame = 0;
-    const first = position() + 1;
-    const last = links.reduce((visible, link, index) => link.offsetLeft + link.clientWidth <= track.scrollLeft + track.clientWidth + 2 ? index + 1 : visible, first);
+    const first = mobile.matches ? position() + 1 : position() * 4 + 1;
+    const last = mobile.matches ? first : Math.min(first + 3, links.length);
     gallery.querySelector('[data-gallery-position]').textContent = `${first}${last > first ? `–${last}` : ''} / ${links.length}`;
     previous.disabled = track.scrollLeft <= 2;
     next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
   };
   const move = delta => {
-    const index = Math.max(0, Math.min(links.length - 1, position() + delta));
-    track.scrollTo({ left: links[index].offsetLeft, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    const all = slides();
+    const index = Math.max(0, Math.min(all.length - 1, position() + delta));
+    track.scrollTo({ left: left(all[index]), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
   };
   previous.addEventListener('click', () => move(-1));
   next.addEventListener('click', () => move(1));
@@ -32,6 +38,7 @@ document.querySelectorAll('[data-gallery]').forEach(gallery => {
   });
   if ('ResizeObserver' in window) new ResizeObserver(update).observe(track);
   else window.addEventListener('resize', update);
+  mobile.addEventListener('change', () => { track.scrollTo({ left: 0, behavior: 'auto' }); update(); });
   gallery.querySelector('.gallery-controls').hidden = links.length < 2;
   update();
   if (typeof dialog.showModal !== 'function') return;

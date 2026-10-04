@@ -28,6 +28,9 @@ try {
     $item = $selection[0]; $item['caption'] = '<img src=x onerror=alert(1)>';
     $html = render_gallery([$item, ['image' => 'assets/images/missing.webp', 'caption' => 'missing', 'alt_text' => 'missing']]);
     check_gallery(substr_count($html, '<figure') === 1 && str_contains($html, '&lt;img src=x') && !str_contains($html, '<img src=x') && str_contains($html, '<a href="') && str_contains($html, '<dialog'), 'Gallery markup/escaping/fallback failed');
+    $mosaic = render_gallery(array_merge($selection, array_slice($selection, 0, 3)));
+    check_gallery(substr_count($mosaic, 'data-gallery-page') === 3 && substr_count($mosaic, 'data-gallery-open=') === 9, 'Four-photo grouping lost or duplicated images');
+    foreach (range(0, 8) as $index) check_gallery(substr_count($mosaic, 'data-gallery-open="' . $index . '"') === 1, 'Lightbox indices must remain continuous across pages');
     gallery_pass('Empty/single/missing gallery states, safe captions and native no-JS full-photo links');
     $tag = 'QA-GALLERY-' . bin2hex(random_bytes(6));
     foreach ([[0, 1], [1, 0]] as [$active, $featured]) {

@@ -1,5 +1,18 @@
 # fiksitt
 
+## Local Reference Redesign (2026-10-05)
+
+The pre-redesign checkpoint is `71286f1`, pushed to `origin/main`.
+Reference-inspired changes live on `codex/reference-redesign`; they have not
+been deployed to production. Preview: http://127.0.0.1:18081/ (also localhost:8080).
+The design uses an off-white/graphite base, restrained oak accents, real WebP
+project photos, four-photo desktop mosaics and a one-photo mobile slider.
+Enquiry uploads, reviews, SEO and the separate bilingual admin remain intact.
+No database migration, account change or SMTP configuration is part of this work.
+Use `tests/design-http.cjs` for read-only checks and the isolated 18084 QA stack
+for `tests/gallery.php` and `tests/gallery-http.cjs`. Never run fixture tests
+against the owner's preview or production database.
+
 ## Current Admin Access (2026-10-04)
 
 Administration now uses a configurable `ADMIN_PATH`, not the public `/admin` URL.
