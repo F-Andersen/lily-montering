@@ -1,0 +1,49 @@
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html
+      - request_photos:/var/lib/fiksitt/request-photos
+    environment:
+      APP_ENV: local
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-lily}
+      DB_USER: ${DB_USER:-lily}
+      DB_PASSWORD: ${DB_PASSWORD:-local-development-only}
+      SETUP_TOKEN: ${SETUP_TOKEN:-}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_ENCRYPTION: none
+      MAIL_RECIPIENT: inbox@lily.test
+      MAIL_FROM: website@lily.test
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-lily}
+      MARIADB_USER: ${DB_USER:-lily}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-local-development-only}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-local-root-development-only}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "127.0.0.1:${MAILPIT_PORT:-8025}:8025"
+volumes:
+  db_data:
+  request_photos:

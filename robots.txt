@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://example.com/sitemap.xml
+# Static preview fallback. PHP hosting serves robots.php at this URL.
+Disallow: /admin/
+Disallow: /app/
+Disallow: /database/

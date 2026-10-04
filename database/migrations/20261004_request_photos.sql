@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS request_photos (
+ id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ request_id INT UNSIGNED NOT NULL,
+ filename VARCHAR(45) NOT NULL UNIQUE,
+ width INT UNSIGNED NOT NULL,
+ height INT UNSIGNED NOT NULL,
+ bytes INT UNSIGNED NOT NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT request_photo_request FOREIGN KEY (request_id) REFERENCES contact_requests(id) ON DELETE CASCADE,
+ INDEX request_photo_order (request_id, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

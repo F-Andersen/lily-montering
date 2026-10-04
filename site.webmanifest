@@ -1,14 +1,14 @@
 {
-  "name": "LILY Montering",
-  "short_name": "LILY",
+  "name": "fiksitt",
+  "short_name": "fiksitt",
   "icons": [
     {
-      "src": "assets/favicon-32.png",
+      "src": "assets/fiksitt-icon-32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "assets/apple-touch-icon.png",
+      "src": "assets/fiksitt-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
     }

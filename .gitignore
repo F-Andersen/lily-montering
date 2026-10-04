@@ -10,3 +10,7 @@ config.php
 .DS_Store
 Thumbs.db
 .vscode/
+.qa/
+assets/uploads/*
+!assets/uploads/.htaccess
+node_modules/

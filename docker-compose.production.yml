@@ -1,0 +1,56 @@
+name: lily
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${WEB_BIND_IP:-127.0.0.1}:${WEB_PORT:-8080}:80"
+      - "${INGRESS_BIND_IP:-127.0.0.1}:${INGRESS_PORT:-18080}:80"
+    environment:
+      APP_ENV: production
+      APP_URL: ${APP_URL:?APP_URL is required}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-lily}
+      DB_USER: ${DB_USER:-lily}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      SETUP_TOKEN: ${SETUP_TOKEN:-}
+      ADMIN_ALLOWED_IPS: ${ADMIN_ALLOWED_IPS:-}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_ENCRYPTION: ${SMTP_ENCRYPTION:-tls}
+      MAIL_RECIPIENT: ${MAIL_RECIPIENT:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+    volumes:
+      - ./assets/uploads:/var/www/html/assets/uploads
+      - request_photos:/var/lib/fiksitt/request-photos
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-lily}
+      MARIADB_USER: ${DB_USER:-lily}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  db_data:
+  request_photos:
