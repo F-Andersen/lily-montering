@@ -15,8 +15,28 @@ if(($_SERVER['REQUEST_METHOD']??'')==='POST') {
 }
 admin_header(admin_t('Omtaler'));
 if($error) admin_error($error);
+$invitations = !$id && ($_GET['view'] ?? '') === 'invitations';
+if (!$id): ?>
+<nav class="review-tabs" aria-label="<?= e(admin_t('Omtaler')) ?>"><a href="<?= e(url('admin/reviews/')) ?>" <?= !$invitations ? 'aria-current="page"' : '' ?>><?= e(admin_t('Omtaler')) ?></a><a href="<?= e(url('admin/reviews/?view=invitations')) ?>" <?= $invitations ? 'aria-current="page"' : '' ?>><?= e(admin_t('Inviter kunder')) ?></a></nav>
+<?php endif;
 try {
-    if($id) {
+    if ($invitations) {
+        $where = "r.archived=0 AND r.status<>'spam' AND NOT EXISTS (SELECT 1 FROM reviews v WHERE v.request_id=r.id)";
+        $total = (int)query('SELECT COUNT(*) FROM contact_requests r WHERE ' . $where)->fetchColumn();
+        [$page, $pages, $offset] = admin_page($total);
+        $requests = query("SELECT r.id,r.name,r.service,r.status,i.id AS invitation_id FROM contact_requests r LEFT JOIN review_invitations i ON i.request_id=r.id WHERE " . $where . " ORDER BY (r.status='completed') DESC,r.created_at DESC,r.id DESC LIMIT 30 OFFSET " . $offset)->fetchAll();
+        $requestStatuses = ['new' => admin_t('Ny'), 'in_progress' => admin_t('Under arbeid'), 'completed' => admin_t('Fullført')];
+        ?><h2><?= e(admin_t('Lenke til kundeomtale')) ?></h2><p class="list-summary"><?= $total ?> <?= e(admin_t('forespørsler')) ?></p>
+<div class="table-scroll"><table><thead><tr><th><?= e(admin_t('Navn')) ?></th><th><?= e(admin_t('Tjeneste')) ?></th><th><?= e(admin_t('Status')) ?></th><th><?= e(admin_t('Handlinger')) ?></th></tr></thead><tbody>
+<?php foreach ($requests as $request): $requestUrl = url('admin/requests/?id=' . (int)$request['id'] . '#invitation-heading'); ?>
+<tr><td><a href="<?= e($requestUrl) ?>"><?= e($request['name']) ?></a></td><td><?= e($request['service']) ?></td><td><span class="status-badge status-<?= e($request['status']) ?>"><?= e($requestStatuses[$request['status']]) ?></span></td><td>
+<?php if ($request['status'] !== 'completed'): ?><a href="<?= e($requestUrl) ?>"><?= e(admin_t('Fullfør oppdraget')) ?></a>
+<?php elseif ($request['invitation_id']): ?><a class="action secondary" href="<?= e($requestUrl) ?>"><?= e(admin_t('Åpne invitasjon')) ?></a>
+<?php else: ?><form method="post" action="<?= e($requestUrl) ?>"><?= csrf_input() ?><input type="hidden" name="id" value="<?= (int)$request['id'] ?>"><button type="submit" name="action" value="create_review_invitation"><?= e(admin_t('Opprett lenke')) ?></button></form><?php endif ?>
+</td></tr><?php endforeach ?></tbody></table></div>
+<?php if (!$requests): ?><p><?= e(admin_t('Ingen oppdrag venter på en omtale.')) ?></p><a href="<?= e(url('admin/requests/')) ?>"><?= e(admin_t('Forespørsler')) ?></a><?php endif;
+        admin_pagination($page, $pages, ['view' => 'invitations']);
+    } elseif($id) {
         $r=query('SELECT v.*,r.service,r.status AS request_status FROM reviews v JOIN contact_requests r ON r.id=v.request_id WHERE v.id=?',[$id])->fetch();
         if(!$r) { http_response_code(404); admin_error(admin_t('Omtalen finnes ikke.')); }
         else {

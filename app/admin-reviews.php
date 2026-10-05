@@ -19,7 +19,7 @@ function review_invitation_action(string $action, int $requestId): void
         unset($_SESSION['review_link']);
         flash(admin_t('Invitasjonen er trukket tilbake.'));
     } else throw new InvalidArgumentException(admin_t('Ugyldig handling.'));
-    redirect('admin/requests/?id='.$requestId);
+    redirect('admin/requests/?id='.$requestId.'#invitation-heading');
 }
 
 function review_invitation_panel(array $request): void

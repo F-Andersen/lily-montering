@@ -38,7 +38,7 @@ async function main() {
   assert.equal(testIndex("local", "https://fiksitt.online", "1"), false);
   assert.equal(testIndex("production", "https://fiksitt.online", "1"), true);
   assert.equal(testIndex("production", "https://fiksitt.online", "0"), false);
-  assert.equal(testIndex("production", "http://188.137.232.136:8080", "1"), false);
+  assert.equal(testIndex("production", "http://192.0.2.1:8080", "1"), false);
   pass("Indexing opt-in: only production and configured public HTTPS domain; local/staging excluded");
   const encoded = Buffer.from(JSON.stringify([email, password])).toString("base64");
   php("require 'app/bootstrap.php'; $v=json_decode(base64_decode('" + encoded + "'),true); query('INSERT INTO admins(email,password_hash) VALUES (?,?)',[$v[0],password_hash($v[1],PASSWORD_DEFAULT)]);");

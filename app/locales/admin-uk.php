@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 return [
+    'Inviter kunder'=>'Запросити клієнтів', 'Lenke til kundeomtale'=>'Посилання для відгуку клієнта', 'Fullfør oppdraget'=>'Завершити замовлення', 'Åpne invitasjon'=>'Відкрити запрошення', 'Opprett lenke'=>'Створити посилання', 'Ingen oppdrag venter på en omtale.'=>'Немає замовлень, що очікують на відгук.',
     'Spam sendes ikke som e-post.'=>'Спам не надсилається поштою.',
     'Bildets dimensjoner er for store eller ugyldige.'=>'Розміри фото завеликі або некоректні.', 'Bildet kunne ikke leses.'=>'Не вдалося прочитати фото.',
     'Ugyldig invitasjon.'=>'Недопустиме запрошення.', 'Invitasjoner krever en fullført, ikke arkivert forespørsel.'=>'Для запрошення потрібна виконана неархівна заявка.', 'Kunden har allerede sendt en omtale.'=>'Клієнт уже надіслав відгук.',

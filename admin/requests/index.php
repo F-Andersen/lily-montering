@@ -26,6 +26,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             if (!isset($statuses[$status])) throw new InvalidArgumentException(admin_t('Ugyldig status.'));
             query('UPDATE contact_requests SET status = ?, archived = ? WHERE id = ?', [$status, isset($_POST['archived']) ? 1 : 0, $id]);
             flash(admin_t('Forespørselen er oppdatert.'));
+            if ($status === 'completed' && !isset($_POST['archived'])) redirect('admin/requests/?id=' . $id . '#invitation-heading');
         }
         redirect('admin/requests/');
     } catch (InvalidArgumentException $ex) { $error = $ex->getMessage(); }

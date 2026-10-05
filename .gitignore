@@ -4,7 +4,37 @@ foto/
 
 # Server-only configuration with real recipients and SMTP passwords.
 config.php
-.env
+.env*
+!.env.example
+config.local*.php
+
+# Private operational notes stay on the owner's machine.
+/CODEX_HANDOFF.md
+/MAIL_DELIVERY.md
+/MANUAL_QA.md
+/QA_REPORT.md
+/SEO_LAUNCH.md
+
+# Credentials, runtime data and deployment backups.
+*.pem
+*.key
+*.ppk
+*.p12
+*.pfx
+*.log
+*.dump
+*.sql.gz
+*.sql.zip
+*.sqlite
+*.sqlite3
+/backups/
+/releases/
+/private/
+/secrets/
+*.sql
+!/database/schema.sql
+!/database/seed.sql
+!/database/migrations/*.sql
 
 # OS/editor noise.
 .DS_Store
