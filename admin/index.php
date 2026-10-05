@@ -8,7 +8,7 @@ try {
     $stats = [
         ['label' => admin_t('Nye forespørsler'), 'count' => (int)$counts['new_count'], 'path' => 'requests/?status=new'],
         ['label' => admin_t('Forespørsler'), 'count' => (int)$counts['total'], 'path' => 'requests/'],
-        ['label' => admin_t('Omtaler til gjennomgang'), 'count' => (int)query("SELECT COUNT(*) FROM reviews WHERE status='pending'")->fetchColumn(), 'path' => 'reviews/'],
+        ['label' => admin_t('Omtaler til gjennomgang'), 'count' => (int)query("SELECT COUNT(*) FROM reviews WHERE status='pending'")->fetchColumn(), 'path' => 'reviews/?status=pending'],
         ['label' => admin_t('Tjenester'), 'count' => (int)query('SELECT COUNT(*) FROM services')->fetchColumn(), 'path' => 'services/'],
         ['label' => admin_t('Bilder'), 'count' => (int)query('SELECT COUNT(*) FROM gallery_items')->fetchColumn(), 'path' => 'gallery/'],
     ];

@@ -87,6 +87,31 @@ try {
     query('UPDATE reviews SET verified_at=NULL WHERE id=?',[$reviewId]);rejects(fn()=>moderate_review($reviewId,'approved',$adminId));
     query('UPDATE reviews SET verified_at=UTC_TIMESTAMP() WHERE id=?',[$reviewId]);query("UPDATE contact_requests SET status='in_progress' WHERE id=?",[$id]);rejects(fn()=>moderate_review($reviewId,'approved',$adminId));
     pass('Rating-neutral approval, withdrawal, rejection and moderator audit; no content editing');
+    query("UPDATE contact_requests SET status='completed' WHERE id=?", [$id]);
+    db()->exec("CREATE TRIGGER qa_review_delete_failure BEFORE DELETE ON reviews FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Synthetic delete failure'");
+    try {
+        try { delete_review($reviewId); throw new RuntimeException('Expected delete rollback'); }
+        catch (PDOException $error) { expect($error->getCode()==='45000', 'Unexpected delete exception'); }
+    } finally { db()->exec('DROP TRIGGER qa_review_delete_failure'); }
+    expect((bool)query('SELECT id FROM reviews WHERE id=?', [$reviewId])->fetch(), 'Failed delete lost review');
+    expect(!query('SELECT revoked_at FROM review_invitations WHERE request_id=?', [$id])->fetchColumn(), 'Failed delete revoked invitation');
+    delete_review($reviewId);
+    expect(!query('SELECT id FROM reviews WHERE id=?', [$reviewId])->fetch(), 'Deleted review survived');
+    expect((bool)query('SELECT id FROM contact_requests WHERE id=?', [$id])->fetch(), 'Deletion removed enquiry');
+    expect((bool)query('SELECT revoked_at FROM review_invitations WHERE request_id=?', [$id])->fetchColumn(), 'Old invite not revoked');
+    rejects(fn()=>submit_review($hash,review_fields($input)));
+    rejects(fn()=>delete_review($reviewId));
+    foreach (['pending','approved','rejected'] as $state) {
+        $job = request_fixture();
+        $invite = create_review_invitation($job, $adminId);
+        $review = submit_review(hash('sha256', $invite['token']), review_fields($input));
+        if ($state !== 'pending') moderate_review($review, $state, $adminId);
+        $original = query('SELECT * FROM contact_requests WHERE id=?', [$job])->fetch();
+        delete_review($review);
+        expect(!query('SELECT id FROM reviews WHERE id=?', [$review])->fetch(), 'State-specific deletion failed');
+        expect(query('SELECT * FROM contact_requests WHERE id=?', [$job])->fetch() === $original, 'Deletion changed enquiry');
+    }
+    pass('Review deletion is atomic, preserves enquiry and cannot reactivate the old invitation');
     query('DELETE FROM contact_requests WHERE id=? AND name=?',[$id,$tag]);
     expect(!query('SELECT id FROM review_invitations WHERE request_id=?',[$id])->fetch() && !query('SELECT id FROM reviews WHERE request_id=?',[$id])->fetch(),'Cascade failed');
     pass('Deleting enquiry cascades invitation and review');
@@ -99,5 +124,5 @@ try {
     foreach($ids as $id) if(!$keep || $id!==$uiId) query('DELETE FROM contact_requests WHERE id=? AND name=?',[$id,$tag]);
     if(!$keep && $adminId) query('DELETE FROM admins WHERE id=? AND email=?',[$adminId,$email]);
     $resultFile=getenv('QA_SMTP_FAILURE')==='1'?'review-workflow-mail-failure.json':'review-workflow-results.json';
-    file_put_contents(dirname(__DIR__).'/.qa/'.$resultFile,json_encode(['groups'=>$groups,'passed'=>count($groups)===9,'keptForUI'=>$keep],JSON_PRETTY_PRINT));
+    file_put_contents(dirname(__DIR__).'/.qa/'.$resultFile,json_encode(['groups'=>$groups,'passed'=>count($groups)===10,'keptForUI'=>$keep],JSON_PRETTY_PRINT));
 }

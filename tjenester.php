@@ -48,7 +48,8 @@ public_head('Møbelmontering og handyman-tjenester i ' . $s['service_region'] . 
 public_header();
 ?>
 <main id="main"><section class="section catalog-section"><div class="section-heading"><p class="eyebrow">Tjenester</p><h1>Montering for hjem, kontor og lokaler</h1><p>Fra en enkel hylle til større innredningsprosjekter. Finn hjelpen som passer oppdraget ditt.</p></div>
-<form class="catalog-filter" method="get" action="<?= e(service_url()) ?>"><label for="category">Kategori</label><select id="category" name="category"><option value="">Alle tjenester</option><?php foreach ($categories as $key => $label): ?><option value="<?= e($key) ?>" <?= $category === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach ?></select><button class="button button-primary" type="submit">Vis tjenester</button></form>
+<form class="catalog-filter" data-catalog-filter method="get" action="<?= e(service_url()) ?>"><label for="category">Kategori</label><select id="category" name="category"><option value="">Alle tjenester</option><?php foreach ($categories as $key => $label): ?><option value="<?= e($key) ?>" <?= $category === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach ?></select><button class="button button-primary" type="submit">Vis tjenester</button></form>
+<p class="catalog-count" role="status">Viser <?= count($visible) ?> <?= count($visible) === 1 ? 'tjeneste' : 'tjenester' ?></p>
 <div class="service-grid"><?php foreach ($visible as $r) service_card($r); ?></div><?php if (!$visible): ?><p>Ingen tjenester i denne kategorien.</p><?php endif ?>
 </section><section class="catalog-cta"><div><h2>Hva skal monteres?</h2><p>Send en kort beskrivelse, så avklarer vi oppdraget.</p><a class="button button-primary" href="<?= e(url('#kontakt')) ?>">Be om tilbud</a></div></section></main>
 <?php public_footer(); ?>

@@ -56,7 +56,7 @@ function public_head(string $title, string $description, string $path = '', ?arr
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="<?= e($title) ?>"><meta name="twitter:description" content="<?= e($description) ?>">
 <meta name="theme-color" content="#fafaf8"><link rel="icon" href="<?= e(url('assets/fiksitt-icon-v2-32.png')) ?>" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="<?= e(url('assets/fiksitt-icon-v2-180.png')) ?>"><link rel="manifest" href="<?= e(url('site.webmanifest?v=3')) ?>">
 <?php if ($hero): ?><link rel="preload" href="<?= e(url('assets/images/og-montering.webp')) ?>" imagesrcset="<?= e(url('assets/images/og-montering-900.webp')) ?> 900w, <?= e(url('assets/images/og-montering.webp')) ?> 1200w" imagesizes="100vw" as="image" type="image/webp" fetchpriority="high"><?php endif ?>
-<link rel="stylesheet" href="<?= e(url('styles.css?v=client-20261005-2')) ?>"><script src="<?= e(url('script.js?v=client-20261005-2')) ?>" defer></script><?php if ($hero): ?><script src="<?= e(url('gallery.js?v=20261005')) ?>" defer></script><?php endif ?>
+<link rel="stylesheet" href="<?= e(url('styles.css?v=client-20261005-2')) ?>"><script src="<?= e(url('script.js?v=client-20261005-3')) ?>" defer></script><?php if ($hero): ?><script src="<?= e(url('gallery.js?v=20261005')) ?>" defer></script><?php endif ?>
 <?php if ($json !== ''): ?><script type="application/ld+json"><?= $json ?></script><?php endif ?>
 </head><body class="public-site"><a class="skip-link" href="#main">Hopp til innhold</a>
 <?php

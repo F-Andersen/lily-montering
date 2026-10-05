@@ -2,6 +2,26 @@
 declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 
+function review_demo_content(): array
+{
+    return [
+        'name' => 'Ole Hansen (fiktivt navn)',
+        'body' => 'Ryddig montering og god kommunikasjon. Garderoben ble tilpasset rommet, og arbeidsområdet ble ryddet etterpå.',
+        'image' => 'assets/images/hvitt-garderoberom.webp',
+    ];
+}
+
+function review_demo_enabled(): bool
+{
+    try {
+        $value = query('SELECT setting_value FROM site_settings WHERE setting_key=?', ['review_demo_enabled'])->fetchColumn();
+        return $value === false || $value === '1';
+    } catch (Throwable $error) {
+        safe_log('review demo setting unavailable', $error);
+        return false;
+    }
+}
+
 function public_reviews(bool &$available): array
 {
     try {
@@ -28,12 +48,12 @@ function reviews_section(array $reviews, bool $available): void
 <?php if (!$reviews): ?>
 <div class="reviews-empty"><p><?= $available ? 'Ingen kundeomtaler publisert ennå.' : 'Kundeomtaler er midlertidig utilgjengelige.' ?></p>
 <a class="button button-primary" href="<?= e(url('#contact-form')) ?>" data-order-open>Bestill nå</a></div>
-<?php if ($available): ?>
+<?php if ($available && review_demo_enabled()): $demo = review_demo_content(); ?>
 <figure class="review-demo" aria-label="Demonstrasjon, ikke en ekte kundeomtale">
-<?= image_html('assets/images/hvitt-garderoberom.webp', 'Montert hvitt garderoberom fra vårt arbeidsfotogalleri', '', true, '(max-width: 680px) 100vw, 400px') ?>
+<?= image_html($demo['image'], 'Montert hvitt garderoberom fra vårt arbeidsfotogalleri', '', true, '(max-width: 680px) 100vw, 400px') ?>
 <div class="review-demo-copy"><h3>Demonstrasjon – ikke en ekte kundeomtale</h3>
-<blockquote><p>«Ryddig montering og god kommunikasjon. Garderoben ble tilpasset rommet, og arbeidsområdet ble ryddet etterpå.»</p></blockquote>
-<figcaption><strong>Ole Hansen (fiktivt navn)</strong><span>Eksempel: garderobemontering</span><small>Illustrasjonsfoto av utført arbeid, ikke et bilde av kunden. Teksten er et demonstrasjonseksempel.</small></figcaption></div>
+<blockquote><p>«<?= e($demo['body']) ?>»</p></blockquote>
+<figcaption><strong><?= e($demo['name']) ?></strong><span>Eksempel: garderobemontering</span><small>Illustrasjonsfoto av utført arbeid, ikke et bilde av kunden. Teksten er et demonstrasjonseksempel.</small></figcaption></div>
 </figure>
 <?php endif ?>
 <?php else: ?><div class="reviews-grid">

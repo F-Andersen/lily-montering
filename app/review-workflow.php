@@ -131,3 +131,22 @@ function moderate_review(int $id, string $status, int $adminId, string $note = '
         db()->commit();
     } catch(Throwable $error) { if(db()->inTransaction()) db()->rollBack(); throw $error; }
 }
+
+function delete_review(int $id): void
+{
+    db()->beginTransaction();
+    try {
+        $row = query('SELECT request_id FROM reviews WHERE id=?', [$id])->fetch();
+        if (!$row) throw new InvalidArgumentException('Omtalen finnes ikke.');
+        query('SELECT id FROM contact_requests WHERE id=? FOR UPDATE', [$row['request_id']]);
+        $review = query('SELECT request_id FROM reviews WHERE id=? FOR UPDATE', [$id])->fetch();
+        if (!$review) throw new InvalidArgumentException('Omtalen finnes ikke.');
+        // Deletion must not make an already delivered invitation usable again.
+        query('UPDATE review_invitations SET revoked_at=UTC_TIMESTAMP() WHERE request_id=?', [$row['request_id']]);
+        query('DELETE FROM reviews WHERE id=?', [$id]);
+        db()->commit();
+    } catch (Throwable $error) {
+        if (db()->inTransaction()) db()->rollBack();
+        throw $error;
+    }
+}

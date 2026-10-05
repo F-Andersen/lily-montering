@@ -40,6 +40,15 @@ function pass(name) { groups.push(name); console.log(`PASS ${name}`); }
     const detail = `/admin/requests/?id=${fixture.id}`;
     page = await admin('/admin/reviews/');
     assert(page.html.includes('Inviter kunder'));
+    assert(page.html.includes('Demonstrasjonsomtale'));
+    assert(page.html.includes('Ole Hansen (fiktivt navn)'));
+    assert.equal((await guest('/admin/reviews/', { action: 'set_review_demo', csrf: csrf(page) })).status, 303);
+    assert.equal((await admin('/admin/reviews/', { action: 'set_review_demo', csrf: 'bad' })).status, 403);
+    assert.equal((await admin('/admin/reviews/', { action: 'set_review_demo', csrf: csrf(page) })).status, 303);
+    assert(!(await guest('/')).html.includes('class="review-demo"'));
+    page = await admin('/admin/reviews/');
+    assert.equal((await admin('/admin/reviews/', { action: 'set_review_demo', csrf: csrf(page), enabled: '1' })).status, 303);
+    assert((await guest('/')).html.includes('Ole Hansen (fiktivt navn)'));
     page = await admin('/admin/reviews/?view=invitations');
     assert(page.html.includes(tag));
     const newRow = page.html.match(new RegExp(`<tr>[^]*?${tag} new[^]*?</tr>`))[0];
@@ -96,6 +105,7 @@ function pass(name) { groups.push(name); console.log(`PASS ${name}`); }
     const home = (await guest('/')).html;
     assert(home.includes('honest customer feedback')); assert(home.includes('&lt;img src=x')); assert(!home.includes('PRIVATE QA NOTE')); assert(home.includes('aria-label="1 av 5 stjerner"'));
     const audit = state('state').reviews[0]; assert.equal(audit.moderated_by, fixture.adminId); assert(audit.moderated_at);
+    assert((await admin('/admin/reviews/')).html.includes(`/adfiksittmin/reviews/?id=${reviewId}&amp;delete=1`), 'Published reviews must be visible by default');
     page = await admin(reviewPath);
     assert.equal((await admin(reviewPath, { csrf: csrf(page), id: reviewId, status: 'rejected', moderation_note: 'Fixture cleanup' })).status, 303);
     assert(!(await guest('/')).html.includes('honest customer feedback'));
@@ -109,8 +119,23 @@ function pass(name) { groups.push(name); console.log(`PASS ${name}`); }
     for (let i = 0; i < 35; i++) page = await other('/omtale.php', { csrf: otherCsrf, action: 'redeem', invitation: 'b'.repeat(64) });
     assert.equal(page.status, 429);
     pass('Used link acknowledgement and HTTP rate limit');
+    page = await admin(reviewPath + '&delete=1');
+    assert(page.html.includes('name="confirm_delete"'));
+    assert.equal(state('state').reviews.length, 1, 'Opening confirmation cannot delete');
+    const deletion = { action: 'delete_review', id: reviewId, csrf: csrf(page), confirm_delete: '1' };
+    assert.equal((await guest(reviewPath, deletion)).status, 303);
+    assert.equal((await admin(reviewPath, { ...deletion, csrf: 'bad' })).status, 403);
+    assert.equal((await admin(reviewPath, { ...deletion, confirm_delete: '0' })).status, 200);
+    assert.equal(state('state').reviews.length, 1);
+    assert.equal((await admin(reviewPath, deletion)).status, 303);
+    const afterDelete = state('state');
+    assert.equal(afterDelete.reviews.length, 0);
+    assert(afterDelete.invitations[0].used_at && afterDelete.invitations[0].revoked_at);
+    assert.equal((await admin(detail)).status, 200, 'Deleting a review cannot delete the enquiry');
+    assert.equal((await admin(reviewPath)).status, 404);
+    pass('Admin-managed demo, all review statuses visible, explicit CSRF-protected deletion preserves enquiry and revokes used link');
   } finally {
     state('cleanup');
-    fs.writeFileSync('.qa/review-workflow-http-results.json', JSON.stringify({ groups, passed: groups.length === 5 }, null, 2));
+    fs.writeFileSync('.qa/review-workflow-http-results.json', JSON.stringify({ groups, passed: groups.length === 6 }, null, 2));
   }
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

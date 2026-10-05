@@ -65,6 +65,13 @@ Reviews remain pending until moderated. The full invitation token is available
 in the issuing admin session for 30 minutes; creating a replacement invalidates
 the previous link.
 
+The Reviews list displays all statuses by default. Administrators can hide the
+clearly labeled demonstration separately from customer reviews, or permanently
+delete a customer review after explicit confirmation. Deletion preserves the
+enquiry and its private photos and revokes its previous invitation. Creating a
+new invitation is a separate deliberate action. Service catalog filters apply
+on selection, with a normal GET submit button retained for browsers without JS.
+
 SMTP acceptance is not confirmation of inbox delivery. Check provider logs and
 the recipient's inbox/spam folder before retrying an ambiguous delivery.
 

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 return [
+    'Demonstrasjonsomtale'=>'Демонстраційний відгук', 'Vis demonstrasjonsomtale'=>'Показувати демонстраційний відгук', 'Demonstrasjonen er oppdatert.'=>'Демонстраційний відгук оновлено.', 'Bekreft sletting av omtalen.'=>'Підтвердьте видалення відгуку.', 'Omtalen er slettet. Forespørselen er beholdt.'=>'Відгук видалено. Заявку збережено.', 'Slette omtalen permanent? Forespørselen og bildene beholdes.'=>'Видалити відгук назавжди? Заявка й фотографії залишаться.', 'Jeg bekrefter at omtalen skal slettes.'=>'Я підтверджую видалення відгуку.', 'Slett omtale'=>'Видалити відгук',
     'Inviter kunder'=>'Запросити клієнтів', 'Lenke til kundeomtale'=>'Посилання для відгуку клієнта', 'Fullfør oppdraget'=>'Завершити замовлення', 'Åpne invitasjon'=>'Відкрити запрошення', 'Opprett lenke'=>'Створити посилання', 'Ingen oppdrag venter på en omtale.'=>'Немає замовлень, що очікують на відгук.',
     'Spam sendes ikke som e-post.'=>'Спам не надсилається поштою.',
     'Bildets dimensjoner er for store eller ugyldige.'=>'Розміри фото завеликі або некоректні.', 'Bildet kunne ikke leses.'=>'Не вдалося прочитати фото.',

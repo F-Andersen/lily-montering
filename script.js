@@ -11,6 +11,12 @@ const siteHeader = document.querySelector(".site-header");
 const orderDialog = document.querySelector("#order-dialog");
 const orderHome = document.querySelector("[data-order-home]");
 
+const catalogFilter = document.querySelector("[data-catalog-filter]");
+catalogFilter?.querySelector("select")?.addEventListener("change", () => {
+  if (typeof catalogFilter.requestSubmit === "function") catalogFilter.requestSubmit();
+  else catalogFilter.submit();
+});
+
 if (orderDialog && orderHome && leadForm && typeof orderDialog.showModal === "function") {
   let orderOpener = null;
   document.querySelectorAll("[data-order-open]").forEach(link => link.addEventListener("click", event => {

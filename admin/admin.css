@@ -37,6 +37,10 @@ h2 { font-size: 20px; margin: 28px 0 16px; }
 .review-tabs { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
 .review-tabs a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; border-bottom: 2px solid transparent; }
 .review-tabs a[aria-current="page"] { border-bottom-color: var(--brand-blue); font-weight: 600; }
+.review-demo-admin { margin-top: 32px; padding-top: 8px; border-top: 1px solid var(--line); max-width: 900px; }
+.review-demo-preview { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 16px; margin-bottom: 16px; overflow-wrap: anywhere; }
+.review-demo-preview img { width: 72px; height: 72px; object-fit: cover; }
+.review-demo-preview p { margin: 4px 0 0; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 24px; }
 .edit-form { display: grid; gap: 18px; max-width: 900px; }
 .fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
