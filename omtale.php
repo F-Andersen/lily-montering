@@ -48,7 +48,7 @@ try {
     }
 } catch(InvalidArgumentException $ex) { if(http_response_code()<400) http_response_code(422); $error=$ex->getMessage(); }
 catch(Throwable $ex) { safe_log('review form unavailable',$ex); http_response_code(503); $available=false; $error='Omtalen kunne ikke lagres nå. Prøv igjen senere.'; }
-?><!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Din omtale | fiksitt</title><link rel="icon" href="<?= e(url('assets/fiksitt-icon-v2-32.png')) ?>"><link rel="stylesheet" href="<?= e(url('styles.css?v=16')) ?>">
+?><!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Din omtale | fiksitt</title><link rel="icon" href="<?= e(url('assets/fiksitt-icon-v2-32.png')) ?>"><link rel="stylesheet" href="<?= e(url('styles.css?v=client-20261005-6')) ?>">
 <script src="<?= e(url('script.js?v=6')) ?>" defer></script><script src="<?= e(url('review.js?v=3')) ?>" defer></script>
 </head><body class="review-route"><a class="skip-link" href="#main">Hopp til innhold</a>
 <?php public_header(); ?>

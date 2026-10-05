@@ -16,7 +16,7 @@ async function main() {
     assert(!response.headers.get('content-security-policy').includes('unsafe-eval'));
     if (route === '/' || route.startsWith('/tjenester')) {
       assert.match(html, /fiksitt-wordmark-v2\.webp/);
-      assert.match(html, /styles\.css\?v=client-20261005-2/);
+      assert.match(html, /styles\.css\?v=client-20261005-6/);
       const json = html.match(/<script type="application\/ld\+json">([^]*?)<\/script>/)?.[1];
       if (json) {
         assert(response.headers.get('content-security-policy').includes('sha256-' + crypto.createHash('sha256').update(json).digest('base64')));
@@ -55,10 +55,39 @@ async function main() {
     }
   }
   const manifest = await (await fetch(base + '/site.webmanifest?v=3')).json();
-  const css = await (await fetch(base + '/styles.css?v=client-20261005-2')).text();
+  const css = await (await fetch(base + '/styles.css?v=client-20261005-6')).text();
   assert.match(css, /--paper: #fafaf8/);
   assert.match(css, /--oak: #d6bc99/);
   assert.match(css, /--ink: #303331/);
+  assert.match(css, /--wood-texture: url\("assets\/textures\/light-oak-v1\.webp"\)/);
+  assert.match(css, /\.quote-cta \{[^}]*background-image: var\(--wood-texture\)/);
+  assert.match(css, /\.button-primary, \.header-cta, \.mobile-action \{[^}]*background-image: var\(--wood-texture\)/);
+  const wood = await fetch(base + '/assets/textures/light-oak-v1.webp');
+  assert.equal(wood.status, 200);
+  assert(wood.headers.get('content-type').startsWith('image/webp'));
+  const woodData = Buffer.from(await wood.arrayBuffer());
+  const woodMeta = await sharp(woodData).metadata();
+  assert.equal(woodMeta.width, 1200);
+  assert.equal(woodMeta.format, 'webp');
+  assert(woodData.length < 80000, 'Oak texture byte budget');
+  const luminance = rgb => rgb.map(value => value / 255)
+    .map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4)
+    .reduce((total, value, channel) => total + value * [.2126, .7152, .0722][channel], 0);
+  const pixels = await sharp(woodData).removeAlpha().raw().toBuffer();
+  for (const sample of [
+    { name: 'Button', ink: [24,27,24], shade: [248,238,220], css: '#f8eedc' },
+    { name: 'Button hover', ink: [24,27,24], shade: [241,223,197], css: '#f1dfc5' },
+    { name: 'Banner copy', ink: [61,57,51], overlay: [250,250,248], css: '#3d3933' },
+  ]) {
+    assert(css.includes(sample.css), sample.name + ' color matches tested CSS');
+    let minimum = Infinity;
+    for (let offset = 0; offset < pixels.length; offset += 3) {
+      const background = [pixels[offset], pixels[offset+1], pixels[offset+2]]
+        .map((value, channel) => sample.shade ? value * sample.shade[channel] / 255 : value * .7 + sample.overlay[channel] * .3);
+      minimum = Math.min(minimum, (luminance(background) + .05) / (luminance(sample.ink) + .05));
+    }
+    assert(minimum >= 4.5, sample.name + ' contrast over darkest texture pixel: ' + minimum.toFixed(2));
+  }
   assert(!css.includes('linear-gradient'), 'Real photographic hero without gradient');
   assert.match(css, /\.gallery-page/);
   assert.match(css, /prefers-reduced-motion/);
@@ -82,6 +111,6 @@ async function main() {
   }
   const staticJson = fs.readFileSync('index.html','utf8').match(/<script type="application\/ld\+json">([^]*?)<\/script>/)[1];
   assert(fs.readFileSync('.htaccess','utf8').includes('sha256-' + crypto.createHash('sha256').update(staticJson).digest('base64')));
-  console.log('PASS reference redesign: 6 routes, neutral/oak palette, 15 photos in 4 mosaics, responsive WebP hero, logo/icon byte budgets, form/review markup, dynamic and static CSP hashes. No data writes or forms sent.');
+  console.log('PASS reference redesign: 6 routes, neutral/oak palette, WebP wood texture and 4.5:1 minimum text contrast, 15 photos in 4 mosaics, responsive WebP hero, logo/icon byte budgets, form/review markup, dynamic and static CSP hashes. No data writes or forms sent.');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
