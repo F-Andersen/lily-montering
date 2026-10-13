@@ -1,0 +1,38 @@
+services:
+  web:
+    build:
+      context: ..
+    ports:
+      - "127.0.0.1::80"
+    volumes:
+      - ../:/var/www/html:ro
+    environment:
+      APP_ENV: local
+      APP_URL: http://127.0.0.1
+      ADMIN_PATH: adfiksittmin
+      DB_HOST: db
+      DB_NAME: fiksitt_auth_qa
+      DB_USER: auth_qa
+      DB_PASSWORD: isolated-auth-test-only
+      SMTP_HOST: mailpit
+      FIKSITT_AUTH_QA: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: fiksitt_auth_qa
+      MARIADB_USER: auth_qa
+      MARIADB_PASSWORD: isolated-auth-test-only
+      MARIADB_ROOT_PASSWORD: isolated-auth-root-test-only
+    volumes:
+      - auth_db:/var/lib/mysql
+      - ../database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 2s
+      timeout: 3s
+      retries: 40
+volumes:
+  auth_db:

@@ -21,7 +21,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             else {
                 $newHash = password_hash($password, PASSWORD_DEFAULT);
                 // Compare the previous hash to avoid racing another password change.
-                $updated = query('UPDATE admins SET password_hash = ? WHERE id = ? AND password_hash = ?', [$newHash, $admin['id'], $hash]);
+                $updated = query('UPDATE admins SET password_hash = ? WHERE id = ? AND active = 1 AND CAST(password_hash AS BINARY) = CAST(? AS BINARY)', [$newHash, $admin['id'], $hash]);
                 if ($updated->rowCount() !== 1) throw new RuntimeException('Password changed concurrently');
                 session_regenerate_id(true);
                 $_SESSION['auth_version'] = hash('sha256', $newHash);
