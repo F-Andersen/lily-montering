@@ -77,6 +77,14 @@ the recipient's inbox/spam folder before retrying an ambiguous delivery.
 
 ## Production Updates
 
+### Git Flow
+
+`main` contains released code; `develop` is the integration branch. Use
+`codex/feature/` branches from `develop` and `codex/release/` branches for release
+preparation. Production security fixes use `codex/hotfix/` branches from `main`,
+then merge into both `main` and `develop`. Tag releases as `vYYYY.MM.DD.N`.
+Deploy the tested, tagged revision with backups; never deploy an uncommitted tree.
+
 Use `docker-compose.production.yml` with server-only environment values.
 Production passwords are required; example development values are not safe.
 Configure `APP_ENV=production`, a trusted HTTPS `APP_URL`, `ADMIN_PATH`, database,
