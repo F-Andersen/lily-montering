@@ -25,6 +25,17 @@ function require_admin_access(): void
 
 require_admin_access();
 
+function refresh_admin_hash(array $admin, string $password): array|false
+{
+    if (!password_needs_rehash($admin['password_hash'], PASSWORD_DEFAULT)) return $admin;
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    // Upgrade only the exact credential version that this login verified.
+    $updated = query('UPDATE admins SET password_hash = ? WHERE id = ? AND active = 1 AND CAST(password_hash AS BINARY) = CAST(? AS BINARY)', [$hash, $admin['id'], $admin['password_hash']]);
+    if ($updated->rowCount() !== 1) return false;
+    $admin['password_hash'] = $hash;
+    return $admin;
+}
+
 function require_admin(): array
 {
     start_session();
